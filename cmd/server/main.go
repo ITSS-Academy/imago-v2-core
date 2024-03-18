@@ -29,7 +29,9 @@ func main() {
 
 	// Firebase init
 	opt := option.WithCredentialsFile(viper.GetString("firebase.credential"))
-	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
+	firebaseApp, err := firebase.NewApp(context.Background(), &firebase.Config{
+		ProjectID: viper.GetString("firebase.projectid"),
+	}, opt)
 	if err != nil {
 		log.Fatalf("error initializing app: %v\n", err)
 	}
