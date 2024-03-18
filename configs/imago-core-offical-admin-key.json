@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "imago-core-offical",
+  "private_key_id": "24480ef5a425517333776ac1ee5009f7d54e89c7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCn/B8iXkfwjaal\ne1OnhILvyQgHHuxlFqOIYx0IT2zl8xq8uq2vVQTRdjQcgPL40xaAXz/2JTxd3KoB\nY9CCR4iGDBhFA+UeeTSu0BNS/mQsRXu6z9S4lNGRzpClRb7ET9NRE8i1kUXFH1Mk\nd8EQDfVGGBmGLI+8x1npzsdlAbo5/xqXqWmCfnxT1d4NOQ3z2H87vxhRrjk4lN0d\nSYYPeCdUVSNGWUpCkIJlsQ1Pq7wLN4+YK0KdQIboqDNpO1fiyXdZPL4gR8Qm89wf\np8pRZxdra5B1ByNJtt5Km4q38GMKvusLE6mWqJBE9gIBsP10BWQgCytWISZGnmap\nuxgsHLK7AgMBAAECggEAN3pgne0dPSjK/KP6QLzWsXJnIFLqJ4iOgaCaGgCBKoBb\nODE+40TkzniHRVKg6+Rq7gKHETfC9AzIaKUaW6xcPkkISuK6bJIDACjf+OzjEGvy\nLQQucLdVbx4VTz/1fMgQNhqekrhjnnJ19vlF3ZN+iaOz6kgVQHdmDn2oBIfJhRVe\nKbRwYOOHTu3+DocLVyBLNAvlpJ4hTPF46EaZx5jFV8liWkrAQ7HzwvZLMN+sl0eL\nTDl7Bs2CuaSEii3ot8pnzFavO8p+XqObNKdP5R/EU9LMb9ClURLADvQHRvdWPRuk\nT4++mhdik01Vngbo/vCE2ONe1IHmuWDsZRAE7kzXIQKBgQDSVjC5mSIHpvHy12YO\n5dNMfeq7RIXDINcujoLeE934LpDMNxSNohRtWWPmeTXl/sc+TdyNPhrA+IJjhWmR\nMkgBV3TPHxaoa/sLIb7mVkqGHJ+/tYrD6prAPjtuRWH1Jg30Rv28ZG8X456M2Gad\nekf8O1dXbGXCjEO/MEEP37EKzwKBgQDMdCh4ZmfCwb006iksx2OmmirsNWAHcXUJ\nnFwumqG+KYUDOnNO1hvz30jGDJj4jPsxN1OXIvYpBHP9zApTa3EkvdAfnHI65RpK\nb6m5TRsJVzpUtwEdKb4Amcl+ZKnO4CyqXjluebw65DR74xMgjo/9YSzaTSvPRkHL\ngIVpKgEkVQKBgBoFp8mOdHNV6CEPHQVC0b1o5p18gL//VB/iabZn5tJJkIhzWAud\nvcE5ie59mHl359aBc4PV5yFwnVEKtGDOQ7JGy6DES91SXqCl8CQ3EMk+yVTCdQSA\nBd061cdytgfKSXerQMEJ++SMuJTcQPXCpx1BijC6rGxBRjBlG+eG2TRpAoGATHKO\ng15/I8J/dd6soLK5Xx08OXBHxOC2i25sxXxKSCmMM8XSQcMrVofB1VP2itFkR2XR\nmqyW8IVavaZiogiFmOBkhr1ftQffSb/w7XmYR2jXRb/b6cSm5+CZB+qp19HYwadT\nwCxCpp6XxU8F4uGLk4mXVNUQMYOqrGYU/FqZbLUCgYEAwvgXl1m+4c4lPh/8tzMC\n4n0jpDzh6lYQfIBShtbI2wqLbSoqpJlF8QTOngQB42H9RZwOcX06jHUzIrlaowo5\n2yRqkc1/YN2M2EN+4PwzPmchSBI8qeLc0QmQPUDfENwNjuARm43QJ2uci6j+ImhM\nEwhxeJkN8j1MfMT64bverBQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-kkqvz@imago-core-offical.iam.gserviceaccount.com",
+  "client_id": "114278483207475055997",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-kkqvz%40imago-core-offical.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

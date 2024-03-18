@@ -3,7 +3,8 @@ server:
   port: "8080"
 
 firebase:
-  credentials: "./configs/firebase-admin.json"
+  credentials: "./configs/admin-key.json"
+  projectid: "itss-imago-0000"
 
 database:
-  dsn: "postgres://behao:4978367589cxnmgvbfyuwe5@localhost:5432/imago"
+  dsn: "postgres://beheo:ANIFHIdndwwid0139@localhost:5432/imago"
