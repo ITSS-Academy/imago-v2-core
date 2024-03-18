@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: "postgres:13"
+    environment:
+      - POSTGRES_USER=behao
+      - POSTGRES_PASSWORD=4978367589cxnmgvbfyuwe5
+      - POSTGRES_DB=imago
+    ports:
+        - "5432:5432"
