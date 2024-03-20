@@ -25,12 +25,27 @@ func (a AuthInterop) GetById(ctx context.Context, token string, id string) (*aut
 	return a.ucase.GetById(ctx, id)
 }
 
-func (a AuthInterop) Get(ctx context.Context, token string, opts *common.QueryOpts) ([]*auth.Auth, error) {
+func (a AuthInterop) Get(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
+	_, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
 	return a.ucase.Get(ctx, opts)
 }
 
 func (a AuthInterop) Update(ctx context.Context, token string, auth *auth.Auth) error {
-	return a.ucase.Update(ctx, auth)
+	record, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	authData, err := a.ucase.GetById(ctx, record.UID)
+	authData.Email = auth.Email
+	authData.RoleId = auth.RoleId
+	authData.Status = auth.Status
+	if err != nil {
+		return err
+	}
+	return a.ucase.Update(ctx, authData)
 }
 
 func (a AuthInterop) ChangeRole(ctx context.Context, token string, roleId string) error {
