@@ -25,23 +25,41 @@ func (a AuthUseCase) Create(ctx context.Context, authData *auth.Auth) error {
 }
 
 func (a AuthUseCase) GetById(ctx context.Context, id string) (*auth.Auth, error) {
-	//TODO implement me
-	panic("implement me")
+	data, err := a.repo.GetById(ctx, id)
+	if err != nil {
+		return nil, auth.ErrAuthNotFound
+	}
+	return data, nil
 }
 
-func (a AuthUseCase) Get(ctx context.Context, opts *common.QueryOpts) ([]*auth.Auth, error) {
-	//TODO implement me
-	panic("implement me")
+func (a AuthUseCase) Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
+	if opts.Page < 1 {
+		return nil, auth.ErrInvalidAuthPage
+	}
+	if opts.Size < 0 {
+		return nil, auth.ErrInvalidAuthSize
+	}
+	return a.repo.Get(ctx, opts)
 }
 
-func (a AuthUseCase) Update(ctx context.Context, auth *auth.Auth) error {
-	//TODO implement me
-	panic("implement me")
+func (a AuthUseCase) Update(ctx context.Context, authData *auth.Auth) error {
+	err := a.Validate(authData)
+	if err != nil {
+		return err
+	}
+	err = a.repo.Update(ctx, authData)
+	if err != nil {
+		return auth.ErrAuthNotUpdated
+	}
+	return nil
 }
 
 func (a AuthUseCase) Delete(ctx context.Context, id string) error {
-	//TODO implement me
-	panic("implement me")
+	err := a.repo.Delete(ctx, id)
+	if err != nil {
+		return auth.ErrAuthNotDeleted
+	}
+	return nil
 }
 
 func (a AuthUseCase) Verify(ctx context.Context, token string) (*firebaseAuth.UserRecord, error) {
@@ -59,6 +77,9 @@ func (a AuthUseCase) Validate(authData *auth.Auth) error {
 	}
 	if authData.RoleId == "" {
 		authData.RoleId = auth.RoleUser
+	}
+	if authData.Status == "" {
+		authData.Status = "active"
 	}
 	return nil
 }
