@@ -2,20 +2,27 @@ package main
 
 import (
 	"context"
-	"firebase.google.com/go/v4"
 	"fmt"
+	"log"
+
+	firebase "firebase.google.com/go/v4"
+	"github.com/itss-academy/imago/core/domain/Report"
 	"github.com/itss-academy/imago/core/domain/auth"
 	authPkgDelivery "github.com/itss-academy/imago/core/internal/auth/delivery"
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
 	authPkgRepo "github.com/itss-academy/imago/core/internal/auth/repo"
 	authPkgUcase "github.com/itss-academy/imago/core/internal/auth/ucase"
+	reportPkgDelivery "github.com/itss-academy/imago/core/internal/report/delivery"
+	reportPkgInterop "github.com/itss-academy/imago/core/internal/report/interop"
+	reportPkgRepo "github.com/itss-academy/imago/core/internal/report/repo"
+	reportPkgUcase "github.com/itss-academy/imago/core/internal/report/usecase"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
 	"google.golang.org/api/option"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 func main() {
@@ -58,14 +65,24 @@ func main() {
 	var authUsecase auth.AuthUseCase
 	var authInterop auth.AuthInterop
 
+	var reportRepo Report.ReportRepository
+	var reportUsecase Report.ReportUseCase
+	var reportInterop Report.ReportInterop
+
 	authRepo = authPkgRepo.NewAuthRepository(db)
 	authUsecase = authPkgUcase.NewAuthUseCase(authRepo, authClient)
 	authInterop = authPkgInterop.NewAuthInterop(authUsecase)
 
+	reportRepo = reportPkgRepo.NewReportRepository(db)
+	reportUsecase = reportPkgUcase.NewReportUseCase(reportRepo, authClient)
+	reportInterop = reportPkgInterop.NewReportInterop(reportUsecase)
 	// add routes
 
 	authApi := e.Group("/v2/auth")
 	authPkgDelivery.NewAuthHttpDelivery(authApi, authInterop)
+
+	reportApi := e.Group("/v2/report")
+	reportPkgDelivery.NewReportHttpDeliver(reportApi, reportInterop)
 
 	// start server
 	_ = e.Start(fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port")))

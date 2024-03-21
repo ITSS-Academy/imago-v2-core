@@ -72,5 +72,6 @@ func (c CategoryUseCase) Validate(data *category.Category) error {
 }
 
 func NewCategoryUseCase(repo category.CategoryRepository) *CategoryUseCase {
+
 	return &CategoryUseCase{repo: repo}
 }

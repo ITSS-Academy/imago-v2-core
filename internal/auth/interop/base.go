@@ -2,6 +2,7 @@ package interop
 
 import (
 	"context"
+	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 )
@@ -12,6 +13,7 @@ type AuthInterop struct {
 
 func (a AuthInterop) Create(ctx context.Context, token string, aut *auth.Auth) error {
 	record, err := a.ucase.Verify(ctx, token)
+	fmt.Print(record)
 	if err != nil {
 		return err
 	}
