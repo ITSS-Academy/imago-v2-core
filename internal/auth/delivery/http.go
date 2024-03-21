@@ -115,7 +115,6 @@ func (a AuthHttpDelivery) ChangeRole(c echo.Context) error {
 }
 
 func (a AuthHttpDelivery) Delete(c echo.Context) error {
-	// use QueryParam instead of Param
 	id := c.QueryParam("id")
 	token := c.Request().Header.Get("Authorization")
 	err := a.interop.Delete(c.Request().Context(), token, id)
