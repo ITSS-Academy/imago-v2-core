@@ -46,7 +46,7 @@ func (a AuthRepository) Update(ctx context.Context, auth *auth.Auth) error {
 }
 
 func (a AuthRepository) Delete(ctx context.Context, id string) error {
-	tx := a.db.Where("id = ?", id).Delete(&auth.Auth{})
+	tx := a.db.WithContext(ctx).Where("id = ?", id).Delete(&auth.Auth{})
 	return tx.Error
 }
 
