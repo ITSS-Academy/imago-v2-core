@@ -10,6 +10,7 @@ import (
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
 	authPkgRepo "github.com/itss-academy/imago/core/internal/auth/repo"
 	authPkgUcase "github.com/itss-academy/imago/core/internal/auth/ucase"
+
 	profilePkgDelivery "github.com/itss-academy/imago/core/internal/profile/delivery"
 	profilePkgInterop "github.com/itss-academy/imago/core/internal/profile/interop"
 	profilePkgRepo "github.com/itss-academy/imago/core/internal/profile/repo"
@@ -73,7 +74,7 @@ func main() {
 
 	profileRepo = profilePkgRepo.NewProfileRepository(db)
 	profileUsecase = profilePkgUcase.NewProfileUseCase(profileRepo)
-	profileInterop = profilePkgInterop.NewProfileInterop(profileUsecase)
+	profileInterop = profilePkgInterop.NewProfileInterop(profileUsecase, authUsecase)
 
 	// add routes
 

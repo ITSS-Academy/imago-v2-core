@@ -17,9 +17,8 @@ func (p ProfileRepository) GetById(ctx context.Context, id string) (*profile.Pro
 }
 
 func (p ProfileRepository) GetAll(ctx context.Context) ([]*profile.Profile, error) {
-	profileList := make([]*profile.Profile, 0)
-	tx := p.db.Find(&profileList)
-	return profileList, tx.Error
+	//TODO implement me
+	panic("implement me")
 }
 
 func (p ProfileRepository) Create(ctx context.Context, profileData *profile.Profile) error {
@@ -28,8 +27,8 @@ func (p ProfileRepository) Create(ctx context.Context, profileData *profile.Prof
 }
 
 func (p ProfileRepository) Update(ctx context.Context, profile *profile.Profile) error {
-	tx := p.db.Save(profile)
-	return tx.Error
+	//TODO implement me
+	panic("implement me")
 }
 
 func NewProfileRepository(db *gorm.DB) *ProfileRepository {

@@ -5,6 +5,7 @@ import (
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 	"gorm.io/gorm"
+	"math"
 )
 
 type AuthRepository struct {
@@ -22,11 +23,21 @@ func (a AuthRepository) GetById(ctx context.Context, id string) (*auth.Auth, err
 	return authData, tx.Error
 }
 
-func (a AuthRepository) Get(ctx context.Context, opts *common.QueryOpts) ([]*auth.Auth, error) {
-	authList := make([]*auth.Auth, 0)
-	offset := opts.Page * opts.Size
-	tx := a.db.Model(&auth.Auth{}).Offset(offset).Limit(opts.Size).Find(&authList)
-	return authList, tx.Error
+func (a AuthRepository) Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
+	authData := make([]*auth.Auth, 0)
+	limit := opts.Size
+	offset := opts.Size * (opts.Page - 1)
+	tx := a.db.Limit(limit).Offset(offset).Find(&authData)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	count := int64(0)
+	tx = a.db.Model(&auth.Auth{}).Count(&count)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	pageNum := int(math.Ceil(float64(count) / float64(limit)))
+	return &common.ListResult[*auth.Auth]{Data: authData, EndPage: pageNum}, tx.Error
 }
 
 func (a AuthRepository) Update(ctx context.Context, auth *auth.Auth) error {
