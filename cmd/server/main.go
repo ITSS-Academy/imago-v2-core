@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
-	"firebase.google.com/go/v4"
 	"fmt"
+
+	firebase "firebase.google.com/go/v4"
 	"github.com/itss-academy/imago/core/domain/auth"
+	"github.com/itss-academy/imago/core/domain/comment"
 	"github.com/itss-academy/imago/core/domain/profile"
 	authPkgDelivery "github.com/itss-academy/imago/core/internal/auth/delivery"
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
@@ -15,13 +17,20 @@ import (
 	profilePkgInterop "github.com/itss-academy/imago/core/internal/profile/interop"
 	profilePkgRepo "github.com/itss-academy/imago/core/internal/profile/repo"
 	profilePkgUcase "github.com/itss-academy/imago/core/internal/profile/ucase"
+
+	commentPkgDelivery "github.com/itss-academy/imago/core/internal/comment/delivery"
+	commentPkgInterop "github.com/itss-academy/imago/core/internal/comment/interop"
+	commentPkgRepo "github.com/itss-academy/imago/core/internal/comment/repo"
+	commentPkgUcase "github.com/itss-academy/imago/core/internal/comment/ucase"
+
+	"log"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
 	"google.golang.org/api/option"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 func main() {
@@ -76,12 +85,22 @@ func main() {
 	profileUsecase = profilePkgUcase.NewProfileUseCase(profileRepo)
 	profileInterop = profilePkgInterop.NewProfileInterop(profileUsecase, authUsecase)
 
+	var commentRepo comment.CommentRepository
+	var commentUsecase comment.CommentUseCase
+	var commentInterop comment.CommentInterop
+
+	commentRepo = commentPkgRepo.NewCommentRepository(db)
+	commentUsecase = commentPkgUcase.NewCommentUseCase(commentRepo)
+	commentInterop = commentPkgInterop.NewCommentInterop(commentUsecase, authUsecase)
+
 	// add routes
 
 	authApi := e.Group("/v2/auth")
 	profileApi := e.Group("/v2/profile")
+	commentApi := e.Group("/v2/comment")
 	authPkgDelivery.NewAuthHttpDelivery(authApi, authInterop)
 	profilePkgDelivery.NewProfileHttpDelivery(profileApi, profileInterop)
+	commentPkgDelivery.NewCommentHttpDelivery(commentApi, commentInterop)
 
 	// start server
 	_ = e.Start(fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port")))
