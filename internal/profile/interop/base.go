@@ -25,7 +25,6 @@ func (p ProfileInterop) GetMine(ctx context.Context, token string) (*profile.Pro
 		return nil, err
 	}
 	return p.ucase.GetById(ctx, record.UID)
-
 }
 
 func (p ProfileInterop) Create(ctx context.Context, token string, profileData *profile.Profile) error {
