@@ -16,7 +16,11 @@ func (p ProfileInterop) GetById(ctx context.Context, token string, id string) (*
 }
 
 func (p ProfileInterop) GetAll(ctx context.Context, token string) ([]*profile.Profile, error) {
-	return p.ucase.GetAll(ctx)
+	profiles, err := p.ucase.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return profiles, nil
 }
 
 func (p ProfileInterop) GetMine(ctx context.Context, token string) (*profile.Profile, error) {
@@ -25,6 +29,7 @@ func (p ProfileInterop) GetMine(ctx context.Context, token string) (*profile.Pro
 		return nil, err
 	}
 	return p.ucase.GetById(ctx, record.UID)
+
 }
 
 func (p ProfileInterop) Create(ctx context.Context, token string, profileData *profile.Profile) error {

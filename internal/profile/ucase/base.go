@@ -18,11 +18,11 @@ func (p ProfileUseCase) GetById(ctx context.Context, id string) (*profile.Profil
 }
 
 func (p ProfileUseCase) GetAll(ctx context.Context) ([]*profile.Profile, error) {
-	data, err := p.repo.GetAll(ctx)
+	profiles, err := p.repo.GetAll(ctx)
 	if err != nil {
-		return nil, profile.ErrProfileNotFound
+		return nil, err
 	}
-	return data, nil
+	return profiles, nil
 }
 
 func (p ProfileUseCase) Create(ctx context.Context, profileData *profile.Profile) error {
