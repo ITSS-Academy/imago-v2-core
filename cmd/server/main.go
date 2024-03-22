@@ -5,10 +5,16 @@ import (
 	"firebase.google.com/go/v4"
 	"fmt"
 	"github.com/itss-academy/imago/core/domain/auth"
+	"github.com/itss-academy/imago/core/domain/profile"
 	authPkgDelivery "github.com/itss-academy/imago/core/internal/auth/delivery"
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
 	authPkgRepo "github.com/itss-academy/imago/core/internal/auth/repo"
 	authPkgUcase "github.com/itss-academy/imago/core/internal/auth/ucase"
+
+	profilePkgDelivery "github.com/itss-academy/imago/core/internal/profile/delivery"
+	profilePkgInterop "github.com/itss-academy/imago/core/internal/profile/interop"
+	profilePkgRepo "github.com/itss-academy/imago/core/internal/profile/repo"
+	profilePkgUcase "github.com/itss-academy/imago/core/internal/profile/ucase"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
@@ -58,14 +64,24 @@ func main() {
 	var authUsecase auth.AuthUseCase
 	var authInterop auth.AuthInterop
 
+	var profileRepo profile.ProfileRepository
+	var profileUsecase profile.ProfileUseCase
+	var profileInterop profile.ProfileInterop
+
 	authRepo = authPkgRepo.NewAuthRepository(db)
 	authUsecase = authPkgUcase.NewAuthUseCase(authRepo, authClient)
 	authInterop = authPkgInterop.NewAuthInterop(authUsecase)
 
+	profileRepo = profilePkgRepo.NewProfileRepository(db)
+	profileUsecase = profilePkgUcase.NewProfileUseCase(profileRepo)
+	profileInterop = profilePkgInterop.NewProfileInterop(profileUsecase, authUsecase)
+
 	// add routes
 
 	authApi := e.Group("/v2/auth")
+	profileApi := e.Group("/v2/profile")
 	authPkgDelivery.NewAuthHttpDelivery(authApi, authInterop)
+	profilePkgDelivery.NewProfileHttpDelivery(profileApi, profileInterop)
 
 	// start server
 	_ = e.Start(fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port")))

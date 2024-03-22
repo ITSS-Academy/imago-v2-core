@@ -3,7 +3,6 @@ ENVIROMENT=staging
 dev:
 	@echo "Starting development server"
 	@echo "Copy environment.yaml to current.yaml"
-	cp ./configs/$(ENVIROMENT).yaml ./current.yaml
 	go run ./cmd/server/main.go --env-file dev.env up
 
 build-bin:
