@@ -35,7 +35,6 @@ func (p ProfileHttpDelivery) GetMine(c echo.Context) error {
 	profileData, err := p.interop.GetMine(c.Request().Context(), token)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
-
 	}
 	return c.JSON(http.StatusOK, profileData)
 }
@@ -44,13 +43,13 @@ func (p ProfileHttpDelivery) GetAll(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	//if token is empty return error
 	if token == "" {
-		return profile.ErrTokenEmpty
+		return c.JSON(http.StatusBadRequest, "token is empty")
 	}
-	profileData, err := p.interop.GetAll(c.Request().Context(), token)
+	profiles, err := p.interop.GetAll(c.Request().Context(), token)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, profileData)
+	return c.JSON(http.StatusOK, profiles)
 }
 
 func (p ProfileHttpDelivery) Create(c echo.Context) error {

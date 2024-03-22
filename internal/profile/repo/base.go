@@ -12,14 +12,21 @@ type ProfileRepository struct {
 
 func (p ProfileRepository) GetById(ctx context.Context, id string) (*profile.Profile, error) {
 	profileData := &profile.Profile{}
-	tx := p.db.Where("id = ?", id).First(profileData)
-	return profileData, tx.Error
+	tx := p.db.Where("uid = ?", id).First(profileData)
+	//if profile not found return error
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return profileData, nil
 }
 
 func (p ProfileRepository) GetAll(ctx context.Context) ([]*profile.Profile, error) {
-	var profileData []*profile.Profile
-	tx := p.db.Find(&profileData)
-	return profileData, tx.Error
+	var profiles []*profile.Profile
+	tx := p.db.Find(&profiles)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return profiles, nil
 }
 
 func (p ProfileRepository) Create(ctx context.Context, profileData *profile.Profile) error {
