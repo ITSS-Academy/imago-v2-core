@@ -29,7 +29,6 @@ type AuthUseCase interface {
 	GetById(ctx context.Context, id string) (*Auth, error)
 	Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Auth], error)
 	Update(ctx context.Context, auth *Auth) error
-
 	Delete(ctx context.Context, id string) error
 	Verify(ctx context.Context, token string) (*auth.UserRecord, error)
 }

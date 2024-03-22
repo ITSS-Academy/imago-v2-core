@@ -16,8 +16,16 @@ func (p ProfileInterop) GetById(ctx context.Context, token string, id string) (*
 }
 
 func (p ProfileInterop) GetAll(ctx context.Context, token string) ([]*profile.Profile, error) {
-	//TODO implement me
-	panic("implement me")
+	return p.ucase.GetAll(ctx)
+}
+
+func (p ProfileInterop) GetMine(ctx context.Context, token string) (*profile.Profile, error) {
+	record, err := p.authucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return p.ucase.GetById(ctx, record.UID)
+
 }
 
 func (p ProfileInterop) Create(ctx context.Context, token string, profileData *profile.Profile) error {
@@ -27,12 +35,40 @@ func (p ProfileInterop) Create(ctx context.Context, token string, profileData *p
 	}
 	profileData.UID = record.UID
 	profileData.Email = record.Email
+	if profileData.UserName == "" || profileData.FirstName == "" || profileData.LastName == "" {
+		return profile.ErrFieldEmpty
+	}
 	return p.ucase.Create(ctx, profileData)
 }
 
-func (p ProfileInterop) Update(ctx context.Context, token string, profile *profile.Profile) error {
-	//TODO implement me
-	panic("implement me")
+func (p ProfileInterop) Update(ctx context.Context, token string, profileData *profile.Profile) error {
+	// Verify the token
+	record, err := p.authucase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	currentProfile, err := p.ucase.GetById(ctx, record.UID)
+	if err != nil {
+		return profile.ErrProfileNotFound
+	}
+	if profileData.UserName != "" {
+		currentProfile.UserName = profileData.UserName
+	}
+	if profileData.FirstName != "" {
+		currentProfile.FirstName = profileData.FirstName
+	}
+	if profileData.LastName != "" {
+		currentProfile.LastName = profileData.LastName
+	}
+	if profileData.Bio != "" {
+		currentProfile.Bio = profileData.Bio
+	}
+
+	err = p.ucase.Update(ctx, currentProfile)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p ProfileInterop) Follow(ctx context.Context, token string, profileId string, profileOther string) error {

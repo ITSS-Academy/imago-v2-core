@@ -25,11 +25,15 @@ func (a AuthUseCase) Create(ctx context.Context, authData *auth.Auth) error {
 }
 
 func (a AuthUseCase) GetById(ctx context.Context, id string) (*auth.Auth, error) {
-	data, err := a.repo.GetById(ctx, id)
+	authData, err := a.repo.GetById(ctx, id)
 	if err != nil {
 		return nil, auth.ErrAuthNotFound
 	}
-	return data, nil
+	err = a.Validate(authData)
+	if err != nil {
+		return nil, auth.ErrAuthNotValid
+	}
+	return authData, nil
 }
 
 func (a AuthUseCase) Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
@@ -85,6 +89,5 @@ func (a AuthUseCase) Validate(authData *auth.Auth) error {
 }
 
 func NewAuthUseCase(repo auth.AuthRepository, authClient *firebaseAuth.Client) *AuthUseCase {
-
 	return &AuthUseCase{repo: repo, authClient: authClient}
 }

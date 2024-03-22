@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"encoding/json"
 	"errors"
 	"golang.org/x/net/context"
 	"gorm.io/gorm"
@@ -8,16 +9,16 @@ import (
 
 type Profile struct {
 	gorm.Model
-	UID       string   `json:"id" gorm:"primaryKey"`
-	UserName  string   `json:"username"`
-	FirstName string   `json:"first_name"`
-	LastName  string   `json:"last_name"`
-	Bio       string   `json:"bio"`
-	Email     string   `json:"email"`
-	PhotoUrl  string   `json:"photo_url"`
-	Category  []string `json:"category"`
-	Followers []string `json:"followers"`
-	Following []string `json:"following"`
+	UID       string          `json:"uid" gorm:"primaryKey"`
+	UserName  string          `json:"username"`
+	FirstName string          `json:"first_name"`
+	LastName  string          `json:"last_name"`
+	Bio       string          `json:"bio"`
+	Email     string          `json:"email"`
+	PhotoUrl  string          `json:"photo_url"`
+	Category  json.RawMessage `json:"category" gorm:"type:json"`
+	Followers json.RawMessage `json:"followers" gorm:"type:json"`
+	Following json.RawMessage `json:"following" gorm:"type:json"`
 }
 
 type ProfileRepository interface {
@@ -36,6 +37,7 @@ type ProfileUseCase interface {
 
 type ProfileInterop interface {
 	GetById(ctx context.Context, token string, id string) (*Profile, error)
+	GetMine(ctx context.Context, token string) (*Profile, error)
 	GetAll(ctx context.Context, token string) ([]*Profile, error)
 	Create(ctx context.Context, token string, profile *Profile) error
 	Update(ctx context.Context, token string, profile *Profile) error
@@ -44,6 +46,7 @@ type ProfileInterop interface {
 }
 
 var (
+	ErrTokenEmpty        = errors.New("token is empty")
 	ErrProfileExists     = errors.New("profile already exists")
 	ErrProfileNotFound   = errors.New("profile not found")
 	ErrIdEmpty           = errors.New("id is empty")

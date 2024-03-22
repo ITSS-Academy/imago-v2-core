@@ -18,8 +18,11 @@ func (p ProfileUseCase) GetById(ctx context.Context, id string) (*profile.Profil
 }
 
 func (p ProfileUseCase) GetAll(ctx context.Context) ([]*profile.Profile, error) {
-	//TODO implement me
-	panic("implement me")
+	data, err := p.repo.GetAll(ctx)
+	if err != nil {
+		return nil, profile.ErrProfileNotFound
+	}
+	return data, nil
 }
 
 func (p ProfileUseCase) Create(ctx context.Context, profileData *profile.Profile) error {
@@ -28,13 +31,32 @@ func (p ProfileUseCase) Create(ctx context.Context, profileData *profile.Profile
 	if err == nil {
 		return profile.ErrProfileExists
 	}
+	//if any of the fields is empty return error
+	if profileData.UserName == "" || profileData.FirstName == "" || profileData.LastName == "" {
+		return profile.ErrFieldEmpty
+	}
 	err = p.repo.Create(ctx, profileData)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (p ProfileUseCase) Update(ctx context.Context, profile *profile.Profile) error {
-	//TODO implement me
-	panic("implement me")
+func (p ProfileUseCase) Update(ctx context.Context, profileData *profile.Profile) error {
+	//get by id to check if profile already exists then return error, else update
+	_, err := p.repo.GetById(ctx, profileData.UID)
+	if err != nil {
+		return profile.ErrProfileNotFound
+	}
+	//if any of the fields is empty return error
+	if profileData.UserName == "" || profileData.FirstName == "" || profileData.LastName == "" {
+		return profile.ErrFieldEmpty
+	}
+	err = p.repo.Update(ctx, profileData)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewProfileUseCase(repo profile.ProfileRepository) *ProfileUseCase {
