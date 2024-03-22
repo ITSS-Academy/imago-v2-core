@@ -102,9 +102,9 @@ func (a AuthHttpDelivery) Update(c echo.Context) error {
 }
 
 func (a AuthHttpDelivery) ChangeRole(c echo.Context) error {
-	roleId := c.QueryParam("role_id")
+	id := c.QueryParam("id")
 	token := c.Request().Header.Get("Authorization")
-	err := a.interop.ChangeRole(c.Request().Context(), token, roleId)
+	err := a.interop.ChangeRole(c.Request().Context(), token, id)
 	if err != nil {
 		if errors.Is(err, auth.ErrAuthNotAuthorized) {
 			return c.JSON(http.StatusUnauthorized, err.Error())
@@ -133,6 +133,7 @@ func NewAuthHttpDelivery(api *echo.Group, interop auth.AuthInterop) *AuthHttpDel
 	api.GET("", handler.Get)
 	api.GET("/id", handler.GetById)
 	api.PUT("", handler.Update)
+	api.PUT("/role_id", handler.ChangeRole)
 	api.DELETE("", handler.Delete)
 	return handler
 }

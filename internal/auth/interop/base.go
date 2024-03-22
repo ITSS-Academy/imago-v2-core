@@ -52,18 +52,27 @@ func (a AuthInterop) Update(ctx context.Context, token string, auth *auth.Auth) 
 	return a.ucase.Update(ctx, authData)
 }
 
-func (a AuthInterop) ChangeRole(ctx context.Context, token string, roleId string) error {
+func (a AuthInterop) ChangeRole(ctx context.Context, token string, id string) error {
 	record, err := a.ucase.Verify(ctx, token)
 	if err != nil {
 		return err
 	}
-	authData, err := a.ucase.GetById(ctx, record.UID)
+	authData, err := a.ucase.GetById(ctx, id)
 	if err != nil {
 		return err
-
 	}
-	if authData.RoleId != auth.RoleAdmin {
+	recordData, err := a.ucase.GetById(ctx, record.UID)
+	if err != nil {
+		return err
+	}
+	if recordData.RoleId != auth.RoleAdmin {
 		return auth.ErrAuthNotAuthorized
+	}
+
+	if authData.RoleId == auth.RoleAdmin {
+		authData.RoleId = auth.RoleUser
+	} else {
+		authData.RoleId = auth.RoleAdmin
 	}
 	return a.ucase.Update(ctx, authData)
 }
