@@ -2,6 +2,7 @@ package ucase
 
 import (
 	"context"
+	"errors"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/comment"
 )
@@ -40,7 +41,6 @@ func (c CommentUseCase) GetCommentByPostId(ctx context.Context, postId string, o
 		return nil, err
 	}
 	return commentData, nil
-
 }
 
 func (c CommentUseCase) GetComment(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*comment.Comment], error) {
@@ -51,12 +51,12 @@ func (c CommentUseCase) GetComment(ctx context.Context, opts *common.QueryOpts) 
 	return commentData, nil
 }
 
-func (c CommentUseCase) UpdateComment(ctx context.Context, commentData *comment.Comment) error {
+func (c CommentUseCase) UpdateComment(ctx context.Context, id string, commentData *comment.Comment) error {
 	err := c.Validate(commentData)
 	if err != nil {
 		return err
 	}
-	err = c.repo.UpdateComment(ctx, commentData)
+	err = c.repo.UpdateComment(ctx, id, commentData)
 	if err != nil {
 		return comment.ErrCommentNotUpdated
 	}
@@ -74,6 +74,9 @@ func (c CommentUseCase) DeleteComment(ctx context.Context, id string) error {
 func (c CommentUseCase) Validate(commentData *comment.Comment) error {
 	if commentData.PostID == "" {
 		return comment.ErrCommentPostId
+	}
+	if commentData.CreatorID == "" {
+		return errors.New("comment creator id is empty")
 	}
 	if commentData.Content == "" {
 		return comment.ErrCommentContentEmpty

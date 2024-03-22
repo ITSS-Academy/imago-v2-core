@@ -49,18 +49,34 @@ func (c CommentHttpDelivery) GetCommentById(e echo.Context) error {
 func (c CommentHttpDelivery) GetCommentByPostId(e echo.Context) error {
 	postId := e.QueryParam("post_id")
 	token := e.Request().Header.Get("Authorization")
-	opts := &common.QueryOpts{}
-	if err := e.Bind(opts); err != nil {
-		return e.NoContent(http.StatusBadRequest)
+	query := &common.QueryOpts{}
+	pageStr := e.QueryParam("page")
+	if pageStr == "" {
+		return e.JSON(http.StatusBadRequest, "page is empty")
 	}
-	commentData, err := c.interop.GetCommentByPostId(e.Request().Context(), token, postId, opts)
-	if err != nil {
-		if errors.Is(err, comment.ErrCommentPostId) {
-			return e.JSON(http.StatusBadRequest, err.Error())
+	sizeStr := e.QueryParam("size")
+	if sizeStr == "" {
+		return e.JSON(http.StatusBadRequest, "size is empty")
+	}
+	if pageStr != "" {
+		page, err := strconv.ParseInt(pageStr, 10, 64)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, "page is not a number")
 		}
-		//if errors.Is(err, comment) {
-		//	return e.JSON(http.StatusNotFound, err.Error())
-		//}
+		query.Page = int(page)
+	}
+	if sizeStr != "" {
+		size, err := strconv.ParseInt(sizeStr, 10, 64)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, "size is not a number")
+		}
+		query.Size = int(size)
+	}
+	commentData, err := c.interop.GetCommentByPostId(e.Request().Context(), token, postId, query)
+	if err != nil {
+		if errors.Is(err, comment.ErrCommentNotFound) {
+			return e.JSON(http.StatusNotFound, err.Error())
+		}
 		return e.JSON(http.StatusUnauthorized, err.Error())
 	}
 	return e.JSON(http.StatusOK, commentData)
@@ -102,12 +118,13 @@ func (c CommentHttpDelivery) GetComment(e echo.Context) error {
 }
 
 func (c CommentHttpDelivery) UpdateComment(e echo.Context) error {
+	id := e.QueryParam("id")
 	commentData := &comment.Comment{}
 	if err := e.Bind(commentData); err != nil {
 		return e.NoContent(http.StatusBadRequest)
 	}
 	token := e.Request().Header.Get("Authorization")
-	err := c.interop.UpdateComment(e.Request().Context(), token, commentData)
+	err := c.interop.UpdateComment(e.Request().Context(), token, id, commentData)
 	if err != nil {
 		if errors.Is(err, comment.ErrCommentIdEmpty) || errors.Is(err, comment.ErrCommentContentEmpty) {
 			return e.JSON(http.StatusBadRequest, err.Error())
@@ -125,9 +142,6 @@ func (c CommentHttpDelivery) DeleteComment(e echo.Context) error {
 		if errors.Is(err, comment.ErrCommentIdEmpty) {
 			return e.JSON(http.StatusBadRequest, err.Error())
 		}
-		//if errors.Is(err, comment) {
-		//	return e.JSON(http.StatusNotFound, err.Error())
-		//}
 		return e.JSON(http.StatusUnauthorized, err.Error())
 	}
 	return e.NoContent(http.StatusOK)
@@ -137,9 +151,9 @@ func NewCommentHttpDelivery(api *echo.Group, interop comment.CommentInterop) *Co
 	handler := &CommentHttpDelivery{api: api, interop: interop}
 	api.POST("", handler.CreateComment)
 	api.GET("/id", handler.GetCommentById)
-	api.GET("/post_id", handler.GetCommentByPostId)
-	api.GET("", handler.GetComment)
+	api.GET("/postId", handler.GetCommentByPostId)
+	api.GET("/all", handler.GetComment)
 	api.PUT("", handler.UpdateComment)
-	api.DELETE("/id", handler.DeleteComment)
+	api.DELETE("", handler.DeleteComment)
 	return handler
 }

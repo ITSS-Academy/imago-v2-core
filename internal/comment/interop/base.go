@@ -5,6 +5,7 @@ import (
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 	"github.com/itss-academy/imago/core/domain/comment"
+	"time"
 )
 
 type CommentInterop struct {
@@ -17,8 +18,10 @@ func (c CommentInterop) CreateComment(ctx context.Context, token string, comment
 	if err != nil {
 		return err
 	}
-	//commentData.ID = common.GenerateID()
 	commentData.CreatorID = record.UID
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("20060102150405")
+	commentData.ID = formattedTime + commentData.CreatorID
 	return c.ucase.CreateComment(ctx, commentData)
 }
 
@@ -46,23 +49,8 @@ func (c CommentInterop) GetComment(ctx context.Context, token string, opts *comm
 	return c.ucase.GetComment(ctx, opts)
 }
 
-func (c CommentInterop) UpdateComment(ctx context.Context, token string, commentUpdate *comment.Comment) error {
-	record, err := c.authUcase.Verify(ctx, token)
-	if err != nil {
-		return err
-	}
-	commentData, err := c.ucase.GetCommentById(ctx, commentUpdate.ID)
-	if err != nil {
-		return err
-	}
-	if commentData.CreatorID != record.UID {
-		return comment.ErrCommentNotUpdated
-	}
-	return c.ucase.UpdateComment(ctx, commentUpdate)
-}
-
-func (c CommentInterop) DeleteComment(ctx context.Context, token string, id string) error {
-	record, err := c.authUcase.Verify(ctx, token)
+func (c CommentInterop) UpdateComment(ctx context.Context, token string, id string, commentUpdate *comment.Comment) error {
+	_, err := c.authUcase.Verify(ctx, token)
 	if err != nil {
 		return err
 	}
@@ -70,8 +58,21 @@ func (c CommentInterop) DeleteComment(ctx context.Context, token string, id stri
 	if err != nil {
 		return err
 	}
-	if commentData.CreatorID != record.UID {
-		return comment.ErrCommentNotDeleted
+	if commentUpdate.CreatorID != commentData.CreatorID {
+		return comment.ErrCommentNotUpdated
+	}
+	commentUpdate.ID = id
+	return c.ucase.UpdateComment(ctx, id, commentUpdate)
+}
+
+func (c CommentInterop) DeleteComment(ctx context.Context, token string, id string) error {
+	_, err := c.authUcase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	_, err = c.ucase.GetCommentById(ctx, id)
+	if err != nil {
+		return err
 	}
 	return c.ucase.DeleteComment(ctx, id)
 }

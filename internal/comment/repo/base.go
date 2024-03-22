@@ -60,8 +60,8 @@ func (c CommentRepository) GetComment(ctx context.Context, opts *common.QueryOpt
 	return &common.ListResult[*comment.Comment]{Data: commentData, EndPage: pageNum}, tx.Error
 }
 
-func (c CommentRepository) UpdateComment(ctx context.Context, comment *comment.Comment) error {
-	tx := c.db.Save(comment)
+func (c CommentRepository) UpdateComment(ctx context.Context, id string, comment *comment.Comment) error {
+	tx := c.db.Where("id = ?", id).Updates(comment)
 	return tx.Error
 }
 

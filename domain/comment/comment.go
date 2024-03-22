@@ -20,7 +20,7 @@ type CommentRepository interface {
 	GetCommentById(ctx context.Context, id string) (*Comment, error)
 	GetCommentByPostId(ctx context.Context, postId string, opts *common.QueryOpts) (*common.ListResult[*Comment], error)
 	GetComment(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Comment], error)
-	UpdateComment(ctx context.Context, comment *Comment) error
+	UpdateComment(ctx context.Context, id string, comment *Comment) error
 	DeleteComment(ctx context.Context, id string) error
 }
 
@@ -29,7 +29,7 @@ type CommentUseCase interface {
 	GetCommentById(ctx context.Context, id string) (*Comment, error)
 	GetCommentByPostId(ctx context.Context, postId string, opts *common.QueryOpts) (*common.ListResult[*Comment], error)
 	GetComment(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Comment], error)
-	UpdateComment(ctx context.Context, comment *Comment) error
+	UpdateComment(ctx context.Context, id string, comment *Comment) error
 	DeleteComment(ctx context.Context, id string) error
 }
 
@@ -38,13 +38,14 @@ type CommentInterop interface {
 	GetCommentById(ctx context.Context, token string, id string) (*Comment, error)
 	GetCommentByPostId(ctx context.Context, token string, postId string, opts *common.QueryOpts) (*common.ListResult[*Comment], error)
 	GetComment(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Comment], error)
-	UpdateComment(ctx context.Context, token string, comment *Comment) error
+	UpdateComment(ctx context.Context, token string, id string, comment *Comment) error
 	DeleteComment(ctx context.Context, token string, id string) error
 }
 
 var (
 	ErrCommentIdEmpty      = errors.New("comment id is empty")
 	ErrCommentPostId       = errors.New("comment post id is empty")
+	ErrCommentCreatorId    = errors.New("comment creator id is empty")
 	ErrCommentContentEmpty = errors.New("comment content is empty")
 	ErrCommentNotFound     = errors.New("comment not found")
 	ErrCommentNotValid     = errors.New("comment not valid")
