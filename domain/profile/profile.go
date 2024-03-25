@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"golang.org/x/net/context"
@@ -16,9 +17,18 @@ type Profile struct {
 	Bio       string          `json:"bio"`
 	Email     string          `json:"email"`
 	PhotoUrl  string          `json:"photo_url"`
-	Category  json.RawMessage `json:"category" gorm:"type:json"`
-	Followers json.RawMessage `json:"followers" gorm:"type:json"`
-	Following json.RawMessage `json:"following" gorm:"type:json"`
+	Category  JSONStringArray `json:"category" gorm:"type:json"`
+	Followers JSONStringArray `json:"followers" gorm:"type:json"`
+	Following JSONStringArray `json:"following" gorm:"type:json"`
+}
+type JSONStringArray []string
+
+func (a *JSONStringArray) Scan(value interface{}) error {
+	return json.Unmarshal(value.([]byte), &a)
+}
+
+func (a JSONStringArray) Value() (driver.Value, error) {
+	return json.Marshal(a)
 }
 
 type ProfileRepository interface {
@@ -41,8 +51,8 @@ type ProfileInterop interface {
 	GetAll(ctx context.Context, token string) ([]*Profile, error)
 	Create(ctx context.Context, token string, profile *Profile) error
 	Update(ctx context.Context, token string, profile *Profile) error
-	Follow(ctx context.Context, token string, profileId string, profileOther string) error
-	Unfollow(ctx context.Context, token string, profileId string, profileOther string) error
+	Follow(ctx context.Context, token string, profileId string, profileOtherId string) error
+	Unfollow(ctx context.Context, token string, profileId string, profileOtherId string) error
 }
 
 var (

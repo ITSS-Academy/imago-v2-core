@@ -60,7 +60,7 @@ func (r ReportInterop) GetAllByStatusPending(ctx context.Context, token string, 
 	if err != nil {
 		return nil, err
 	}
-	return r.ucase.GetAllByStatusCompleted(ctx, opts)
+	return r.ucase.GetAllByStatusPending(ctx, opts)
 }
 
 // Update report by id
