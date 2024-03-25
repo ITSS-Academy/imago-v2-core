@@ -74,7 +74,6 @@ func (a AuthUseCase) Verify(ctx context.Context, token string) (*firebaseAuth.Us
 	record, err := a.authClient.GetUser(ctx, idToken.UID)
 	return record, nil
 }
-
 func (a AuthUseCase) Validate(authData *auth.Auth) error {
 	if authData.Email == "" {
 		return auth.ErrEmailEmpty
