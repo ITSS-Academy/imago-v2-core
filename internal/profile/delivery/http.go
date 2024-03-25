@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"context"
 	"github.com/itss-academy/imago/core/domain/profile"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -88,14 +87,41 @@ func (p ProfileHttpDelivery) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, profileData)
 }
 
-func (p ProfileHttpDelivery) Follow(ctx context.Context, token string, profileId string, profileOther string) error {
-	//TODO implement me
-	panic("implement me")
+func (p ProfileHttpDelivery) Follow(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	if token == "" {
+		return c.JSON(http.StatusBadRequest, "token is empty")
+	}
+
+	profileId := c.QueryParam("profileId")
+	profileOtherId := c.QueryParam("profileOtherId")
+
+	err := p.interop.Follow(c.Request().Context(), token, profileId, profileOtherId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+
+	}
+
+	return c.JSON(http.StatusOK, "Followed")
+
 }
 
-func (p ProfileHttpDelivery) Unfollow(ctx context.Context, token string, profileId string, profileOther string) error {
-	//TODO implement me
-	panic("implement me")
+func (p ProfileHttpDelivery) Unfollow(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	if token == "" {
+		return c.JSON(http.StatusBadRequest, "token is empty")
+	}
+
+	profileId := c.QueryParam("profileId")
+	profileOtherId := c.QueryParam("profileOtherId")
+
+	err := p.interop.Unfollow(c.Request().Context(), token, profileId, profileOtherId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+
+	}
+
+	return c.JSON(http.StatusOK, "Unfollowed")
 }
 
 func NewProfileHttpDelivery(api *echo.Group, interop profile.ProfileInterop) *ProfileHttpDelivery {
@@ -108,5 +134,7 @@ func NewProfileHttpDelivery(api *echo.Group, interop profile.ProfileInterop) *Pr
 	api.GET("/mine", handler.GetMine)
 	api.POST("/mine", handler.Create)
 	api.PUT("/mine", handler.Update)
+	api.PUT("/follow", handler.Follow)
+	api.PUT("/unfollow", handler.Unfollow)
 	return handler
 }
