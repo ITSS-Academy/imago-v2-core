@@ -14,7 +14,7 @@ type PostRepository struct {
 
 func (p PostRepository) Create(ctx context.Context, post *post.Post) error {
 
-	tx := p.db.WithContext(ctx).Create(post)
+	tx := p.db.Create(post)
 	return tx.Error
 }
 

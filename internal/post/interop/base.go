@@ -41,9 +41,9 @@ func (p *PostBaseInterop) Create(ctx context.Context, token string, post *post.P
 	return p.postUseCase.Create(ctx, post)
 }
 
-func NewPostBaseInterop(postUseCase post.PostUseCase, authUseCase auth.AuthUseCase) *PostBaseInterop {
+func NewPostBaseInterop(postUseCase post.PostUseCase, authUcase auth.AuthUseCase) *PostBaseInterop {
 	return &PostBaseInterop{
 		postUseCase: postUseCase,
-		authUseCase: authUseCase,
+		authUseCase: authUcase,
 	}
 }

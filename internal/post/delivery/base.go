@@ -66,6 +66,6 @@ func (p PostHttpDelivery) Create(c echo.Context) error {
 func NewPostHttpDelivery(api *echo.Group, interop post.PostInterop) *PostHttpDelivery {
 	handler := &PostHttpDelivery{api: api, interop: interop}
 	api.POST("", handler.Create)
-	api.GET("", handler.List)
+	api.GET("/all", handler.List)
 	return handler
 }

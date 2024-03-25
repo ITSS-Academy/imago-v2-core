@@ -2,25 +2,43 @@ package post
 
 import (
 	"context"
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"github.com/itss-academy/imago/core/common"
 	"gorm.io/gorm"
 )
 
+type MultiString []string
+
+func (s *MultiString) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		return json.Unmarshal(v, s)
+	case string:
+		return json.Unmarshal([]byte(v), s)
+	default:
+		return errors.New("unsupported type for ShareType")
+	}
+}
+
+func (s MultiString) Value() (driver.Value, error) {
+	return json.Marshal(s)
+}
+
 type Post struct {
 	gorm.Model
-	ID         string          `json:"id" gorm:"primaryKey"`
-	Content    string          `json:"content"`
-	CreatorId  string          `json:"creator_id"`
-	CategoryId json.RawMessage `json:"category_id" gorm:"type:json"`
-	PhotoUrl   json.RawMessage `json:"photo_url" gorm:"type:json"`
-	Like       json.RawMessage `json:"like" gorm:"type:json"`
-	Comment    json.RawMessage `json:"comment" gorm:"type:json"`
-	HashTag    json.RawMessage `json:"hash_tag" gorm:"type:json"`
-	Share      json.RawMessage `json:"share" gorm:"type:json"`
-	Status     string          `json:"status"`
-	Mention    json.RawMessage `json:"mention" gorm:"type:json"`
+	ID         string      `json:"id" gorm:"primaryKey"`
+	Content    string      `json:"content"`
+	CreatorId  string      `json:"creator_id"`
+	CategoryId MultiString `json:"category_id" gorm:"type:text" `
+	PhotoUrl   MultiString `json:"photo_url" gorm:"type:text" `
+	Like       MultiString `json:"like" gorm:"type:text"`
+	Comment    MultiString `json:"comment"gorm:"type:text" `
+	HashTag    MultiString `json:"hash_tag" gorm:"type:text" `
+	Share      MultiString `json:"share" gorm:"type:text" `
+	Status     string      `json:"status"`
+	Mention    MultiString `json:"mention" gorm:"type:text"`
 }
 
 type PostRepository interface {
