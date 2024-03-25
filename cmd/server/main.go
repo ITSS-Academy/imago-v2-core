@@ -2,14 +2,30 @@ package main
 
 import (
 	"context"
-	"firebase.google.com/go/v4"
 	"fmt"
+
+	firebase "firebase.google.com/go/v4"
 	"github.com/itss-academy/imago/core/domain/auth"
+	"github.com/itss-academy/imago/core/domain/comment"
+	"github.com/itss-academy/imago/core/domain/profile"
 	"github.com/itss-academy/imago/core/domain/post"
 	authPkgDelivery "github.com/itss-academy/imago/core/internal/auth/delivery"
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
 	authPkgRepo "github.com/itss-academy/imago/core/internal/auth/repo"
 	authPkgUcase "github.com/itss-academy/imago/core/internal/auth/ucase"
+
+	profilePkgDelivery "github.com/itss-academy/imago/core/internal/profile/delivery"
+	profilePkgInterop "github.com/itss-academy/imago/core/internal/profile/interop"
+	profilePkgRepo "github.com/itss-academy/imago/core/internal/profile/repo"
+	profilePkgUcase "github.com/itss-academy/imago/core/internal/profile/ucase"
+
+	commentPkgDelivery "github.com/itss-academy/imago/core/internal/comment/delivery"
+	commentPkgInterop "github.com/itss-academy/imago/core/internal/comment/interop"
+	commentPkgRepo "github.com/itss-academy/imago/core/internal/comment/repo"
+	commentPkgUcase "github.com/itss-academy/imago/core/internal/comment/ucase"
+
+	"log"
+
 	postPkgDelivery "github.com/itss-academy/imago/core/internal/post/delivery"
 	postPkgInterop "github.com/itss-academy/imago/core/internal/post/interop"
 	postPkgRepo "github.com/itss-academy/imago/core/internal/post/repo"
@@ -20,7 +36,6 @@ import (
 	"google.golang.org/api/option"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 func main() {
@@ -63,6 +78,9 @@ func main() {
 	var authUsecase auth.AuthUseCase
 	var authInterop auth.AuthInterop
 
+	var profileRepo profile.ProfileRepository
+	var profileUsecase profile.ProfileUseCase
+	var profileInterop profile.ProfileInterop
 	var postRepo post.PostRepository
 	var postUsecase post.PostUseCase
 	var postInterop post.PostInterop
@@ -75,10 +93,26 @@ func main() {
 	authUsecase = authPkgUcase.NewAuthUseCase(authRepo, authClient)
 	authInterop = authPkgInterop.NewAuthInterop(authUsecase)
 
+	profileRepo = profilePkgRepo.NewProfileRepository(db)
+	profileUsecase = profilePkgUcase.NewProfileUseCase(profileRepo)
+	profileInterop = profilePkgInterop.NewProfileInterop(profileUsecase, authUsecase)
+
+	var commentRepo comment.CommentRepository
+	var commentUsecase comment.CommentUseCase
+	var commentInterop comment.CommentInterop
+
+	commentRepo = commentPkgRepo.NewCommentRepository(db)
+	commentUsecase = commentPkgUcase.NewCommentUseCase(commentRepo)
+	commentInterop = commentPkgInterop.NewCommentInterop(commentUsecase, authUsecase)
+
 	// add routes
 
 	authApi := e.Group("/v2/auth")
+	profileApi := e.Group("/v2/profile")
+	commentApi := e.Group("/v2/comment")
 	authPkgDelivery.NewAuthHttpDelivery(authApi, authInterop)
+	profilePkgDelivery.NewProfileHttpDelivery(profileApi, profileInterop)
+	commentPkgDelivery.NewCommentHttpDelivery(commentApi, commentInterop)
 
 	postApi := e.Group("/v2/post")
 	postPkgDelivery.NewPostHttpDelivery(postApi, postInterop)

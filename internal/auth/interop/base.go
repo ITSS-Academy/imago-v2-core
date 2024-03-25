@@ -22,18 +22,62 @@ func (a AuthInterop) Create(ctx context.Context, token string, aut *auth.Auth) e
 }
 
 func (a AuthInterop) GetById(ctx context.Context, token string, id string) (*auth.Auth, error) {
+	_, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
 	return a.ucase.GetById(ctx, id)
 }
 
-func (a AuthInterop) Get(ctx context.Context, token string, opts *common.QueryOpts) ([]*auth.Auth, error) {
+func (a AuthInterop) Get(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
+	_, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
 	return a.ucase.Get(ctx, opts)
 }
 
 func (a AuthInterop) Update(ctx context.Context, token string, auth *auth.Auth) error {
-	return a.ucase.Update(ctx, auth)
+	record, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	authData, err := a.ucase.GetById(ctx, record.UID)
+	authData.Email = auth.Email
+	authData.RoleId = auth.RoleId
+	authData.Status = auth.Status
+	if err != nil {
+		return err
+	}
+	return a.ucase.Update(ctx, authData)
 }
 
-func (a AuthInterop) ChangeRole(ctx context.Context, token string, roleId string) error {
+func (a AuthInterop) ChangeRole(ctx context.Context, token string, id string) error {
+	record, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	authData, err := a.ucase.GetById(ctx, id)
+	if err != nil {
+		return err
+	}
+	recordData, err := a.ucase.GetById(ctx, record.UID)
+	if err != nil {
+		return err
+	}
+	if recordData.RoleId != auth.RoleAdmin {
+		return auth.ErrAuthNotAuthorized
+	}
+
+	if authData.RoleId == auth.RoleAdmin {
+		authData.RoleId = auth.RoleUser
+	} else {
+		authData.RoleId = auth.RoleAdmin
+	}
+	return a.ucase.Update(ctx, authData)
+}
+
+func (a AuthInterop) Delete(ctx context.Context, token string, id string) error {
 	record, err := a.ucase.Verify(ctx, token)
 	if err != nil {
 		return err
@@ -41,15 +85,10 @@ func (a AuthInterop) ChangeRole(ctx context.Context, token string, roleId string
 	authData, err := a.ucase.GetById(ctx, record.UID)
 	if err != nil {
 		return err
-
 	}
 	if authData.RoleId != auth.RoleAdmin {
 		return auth.ErrAuthNotAuthorized
 	}
-	return a.ucase.Update(ctx, authData)
-}
-
-func (a AuthInterop) Delete(ctx context.Context, token string, id string) error {
 	return a.ucase.Delete(ctx, id)
 }
 
