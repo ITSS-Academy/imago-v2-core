@@ -54,8 +54,11 @@ func (r ReportRepository) GetAllByStatusCompleted(ctx context.Context, opts *com
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	pageNum := int(math.Ceil(float64(count) / float64(limit)))
-	return &common.ListResult[*Report.Report]{Data: reportData, EndPage: pageNum}, tx.Error
+	pageNum := int64(0)
+	if count > 0 {
+		pageNum = int64(math.Ceil(float64(count) / float64(limit)))
+	}
+	return &common.ListResult[*Report.Report]{Data: reportData, EndPage: int(pageNum)}, tx.Error
 
 }
 
@@ -72,13 +75,23 @@ func (r ReportRepository) GetAllByStatusPending(ctx context.Context, opts *commo
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	pageNum := int(math.Ceil(float64(count) / float64(limit)))
-	return &common.ListResult[*Report.Report]{Data: reportData, EndPage: pageNum}, tx.Error
+	pageNum := int64(0)
+	if count > 0 {
+		pageNum = int64(math.Ceil(float64(count) / float64(limit)))
+	}
+	return &common.ListResult[*Report.Report]{Data: reportData, EndPage: int(pageNum)}, tx.Error
 }
 
-func (r ReportRepository) Update(ctx context.Context, report *Report.Report) error {
-	tx := r.db.Save(report)
+func (r ReportRepository) Update(ctx context.Context, report *Report.Report, id string) error {
+	tx := r.db.Model(&Report.Report{}).Where("id = ?", id).Updates(report)
 	return tx.Error
+}
+
+// DeleteReport delete report by id
+func (r ReportRepository) Delete(ctx context.Context, id string) error {
+	tx := r.db.Where("id = ?", id).Delete(&Report.Report{})
+	return tx.Error
+
 }
 
 func NewReportRepository(db *gorm.DB) *ReportRepository {

@@ -2,24 +2,20 @@ package usecase
 
 import (
 	"context"
-	firebaseAuth "firebase.google.com/go/v4/auth"
-	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/Report"
 )
 
 type ReportUseCase struct {
-	repo       Report.ReportRepository
-	authClient *firebaseAuth.Client
+	repo Report.ReportRepository
 }
 
 func (r ReportUseCase) Create(ctx context.Context, reportData *Report.Report) error {
 	err := r.Validate(reportData)
-	fmt.Print(reportData)
 	if err != nil {
 		return err
 	}
-	err = r.Create(ctx, reportData)
+	err = r.repo.Create(ctx, reportData)
 	if err != nil {
 		return Report.ErrReportNotCreated
 	}
@@ -60,12 +56,28 @@ func (r ReportUseCase) GetAllByStatusPending(ctx context.Context, opts *common.Q
 	return data, nil
 }
 
-func (r ReportUseCase) Update(ctx context.Context, report *Report.Report) error {
-	data := r.repo.Update(ctx, report)
-	if data != nil {
+// Update report by id
+func (r ReportUseCase) Update(ctx context.Context, reportData *Report.Report, id string) error {
+	err := r.Validate(reportData)
+	if err != nil {
+		return err
+	}
+	err = r.repo.Update(ctx, reportData, id)
+	if err != nil {
 		return Report.ErrReportNotUpdated
 	}
-	return data
+	return nil
+
+}
+
+// Delete report by id
+func (r ReportUseCase) Delete(ctx context.Context, id string) error {
+	err := r.repo.Delete(ctx, id)
+	if err != nil {
+		return Report.ErrReportNotFound
+	}
+	return nil
+
 }
 
 func (r ReportUseCase) Validate(data *Report.Report) error {
@@ -94,9 +106,8 @@ func (r ReportUseCase) Validate(data *Report.Report) error {
 
 }
 
-func NewReportUseCase(repo Report.ReportRepository, authClient *firebaseAuth.Client) Report.ReportUseCase {
+func NewReportUseCase(repo Report.ReportRepository) *ReportUseCase {
 	return &ReportUseCase{
-		repo:       repo,
-		authClient: authClient,
+		repo: repo,
 	}
 }

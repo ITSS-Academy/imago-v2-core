@@ -2,8 +2,6 @@ package ucase
 
 import (
 	"context"
-	"fmt"
-
 	firebaseAuth "firebase.google.com/go/v4/auth"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
@@ -27,11 +25,15 @@ func (a AuthUseCase) Create(ctx context.Context, authData *auth.Auth) error {
 }
 
 func (a AuthUseCase) GetById(ctx context.Context, id string) (*auth.Auth, error) {
-	data, err := a.repo.GetById(ctx, id)
+	authData, err := a.repo.GetById(ctx, id)
 	if err != nil {
 		return nil, auth.ErrAuthNotFound
 	}
-	return data, nil
+	err = a.Validate(authData)
+	if err != nil {
+		return nil, auth.ErrAuthNotValid
+	}
+	return authData, nil
 }
 
 func (a AuthUseCase) Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
@@ -66,12 +68,10 @@ func (a AuthUseCase) Delete(ctx context.Context, id string) error {
 
 func (a AuthUseCase) Verify(ctx context.Context, token string) (*firebaseAuth.UserRecord, error) {
 	idToken, err := a.authClient.VerifyIDToken(ctx, token)
-	fmt.Print(idToken)
 	if err != nil {
 		return nil, err
 	}
 	record, err := a.authClient.GetUser(ctx, idToken.UID)
-	fmt.Print(record)
 	return record, nil
 }
 func (a AuthUseCase) Validate(authData *auth.Auth) error {
@@ -88,6 +88,5 @@ func (a AuthUseCase) Validate(authData *auth.Auth) error {
 }
 
 func NewAuthUseCase(repo auth.AuthRepository, authClient *firebaseAuth.Client) *AuthUseCase {
-
 	return &AuthUseCase{repo: repo, authClient: authClient}
 }

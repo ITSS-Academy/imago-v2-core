@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
-
 	firebase "firebase.google.com/go/v4"
+	"fmt"
 	"github.com/itss-academy/imago/core/domain/Report"
+
 	"github.com/itss-academy/imago/core/domain/auth"
+	"github.com/itss-academy/imago/core/domain/comment"
+	"github.com/itss-academy/imago/core/domain/profile"
 	authPkgDelivery "github.com/itss-academy/imago/core/internal/auth/delivery"
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
 	authPkgRepo "github.com/itss-academy/imago/core/internal/auth/repo"
@@ -16,6 +17,17 @@ import (
 	reportPkgInterop "github.com/itss-academy/imago/core/internal/report/interop"
 	reportPkgRepo "github.com/itss-academy/imago/core/internal/report/repo"
 	reportPkgUcase "github.com/itss-academy/imago/core/internal/report/usecase"
+
+	profilePkgDelivery "github.com/itss-academy/imago/core/internal/profile/delivery"
+	profilePkgInterop "github.com/itss-academy/imago/core/internal/profile/interop"
+	profilePkgRepo "github.com/itss-academy/imago/core/internal/profile/repo"
+	profilePkgUcase "github.com/itss-academy/imago/core/internal/profile/ucase"
+
+	commentPkgDelivery "github.com/itss-academy/imago/core/internal/comment/delivery"
+	commentPkgInterop "github.com/itss-academy/imago/core/internal/comment/interop"
+	commentPkgRepo "github.com/itss-academy/imago/core/internal/comment/repo"
+	commentPkgUcase "github.com/itss-academy/imago/core/internal/comment/ucase"
+	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -68,18 +80,37 @@ func main() {
 	var reportRepo Report.ReportRepository
 	var reportUsecase Report.ReportUseCase
 	var reportInterop Report.ReportInterop
+	var profileRepo profile.ProfileRepository
+	var profileUsecase profile.ProfileUseCase
+	var profileInterop profile.ProfileInterop
 
 	authRepo = authPkgRepo.NewAuthRepository(db)
 	authUsecase = authPkgUcase.NewAuthUseCase(authRepo, authClient)
 	authInterop = authPkgInterop.NewAuthInterop(authUsecase)
 
 	reportRepo = reportPkgRepo.NewReportRepository(db)
-	reportUsecase = reportPkgUcase.NewReportUseCase(reportRepo, authClient)
-	reportInterop = reportPkgInterop.NewReportInterop(reportUsecase)
+	reportUsecase = reportPkgUcase.NewReportUseCase(reportRepo)
+	reportInterop = reportPkgInterop.NewReportInterop(reportUsecase, authUsecase)
+	profileRepo = profilePkgRepo.NewProfileRepository(db)
+	profileUsecase = profilePkgUcase.NewProfileUseCase(profileRepo)
+	profileInterop = profilePkgInterop.NewProfileInterop(profileUsecase, authUsecase)
+
+	var commentRepo comment.CommentRepository
+	var commentUsecase comment.CommentUseCase
+	var commentInterop comment.CommentInterop
+
+	commentRepo = commentPkgRepo.NewCommentRepository(db)
+	commentUsecase = commentPkgUcase.NewCommentUseCase(commentRepo)
+	commentInterop = commentPkgInterop.NewCommentInterop(commentUsecase, authUsecase)
+
 	// add routes
 
 	authApi := e.Group("/v2/auth")
+	profileApi := e.Group("/v2/profile")
+	commentApi := e.Group("/v2/comment")
 	authPkgDelivery.NewAuthHttpDelivery(authApi, authInterop)
+	profilePkgDelivery.NewProfileHttpDelivery(profileApi, profileInterop)
+	commentPkgDelivery.NewCommentHttpDelivery(commentApi, commentInterop)
 
 	reportApi := e.Group("/v2/report")
 	reportPkgDelivery.NewReportHttpDeliver(reportApi, reportInterop)

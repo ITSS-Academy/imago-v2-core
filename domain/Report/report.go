@@ -23,7 +23,8 @@ type ReportRepository interface {
 	GetById(ctx context.Context, id string) (*Report, error)
 	GetAllByStatusCompleted(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetAllByStatusPending(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
-	Update(ctx context.Context, report *Report) error
+	Update(ctx context.Context, report *Report, id string) error
+	Delete(ctx context.Context, id string) error
 }
 
 type ReportUseCase interface {
@@ -32,7 +33,8 @@ type ReportUseCase interface {
 	GetById(ctx context.Context, id string) (*Report, error)
 	GetAllByStatusCompleted(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetAllByStatusPending(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
-	Update(ctx context.Context, report *Report) error
+	Update(ctx context.Context, report *Report, id string) error
+	Delete(ctx context.Context, id string) error
 }
 
 type ReportInterop interface {
@@ -41,7 +43,8 @@ type ReportInterop interface {
 	GetById(ctx context.Context, token string, id string) (*Report, error)
 	GetAllByStatusCompleted(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetAllByStatusPending(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Report], error)
-	Update(ctx context.Context, token string, report *Report) error
+	Update(ctx context.Context, token string, report *Report, id string) error
+	Delete(ctx context.Context, token string, id string) error
 }
 
 var (

@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -36,6 +37,7 @@ func (r ReportHttpDelivery) Create(c echo.Context) error {
 
 func (r ReportHttpDelivery) GetById(c echo.Context) error {
 	id := c.QueryParam("id")
+	fmt.Println(id)
 	token := c.Request().Header.Get("Authorization")
 	reportData, err := r.interop.GetById(c.Request().Context(), token, id)
 	if err != nil {
@@ -48,7 +50,6 @@ func (r ReportHttpDelivery) GetById(c echo.Context) error {
 
 }
 
-// get
 func (r ReportHttpDelivery) Get(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	query := &common.QueryOpts{}
@@ -141,7 +142,6 @@ func (r ReportHttpDelivery) GetAllByStatusPending(c echo.Context) error {
 		query.Page = page
 	}
 	if sizeStr != "" {
-
 		size, err := strconv.Atoi(sizeStr)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, "size is invalid")
@@ -159,12 +159,13 @@ func (r ReportHttpDelivery) GetAllByStatusPending(c echo.Context) error {
 }
 
 func (r ReportHttpDelivery) Update(c echo.Context) error {
+	id := c.QueryParam("id")
 	reportData := &Report.Report{}
 	if err := c.Bind(reportData); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	token := c.Request().Header.Get("Authorization")
-	err := r.interop.Update(c.Request().Context(), token, reportData)
+	err := r.interop.Update(c.Request().Context(), token, reportData, id)
 	if err != nil {
 		if errors.Is(err, Report.ErrReportNotFound) {
 			return c.JSON(http.StatusNotFound, err.Error())
@@ -174,13 +175,27 @@ func (r ReportHttpDelivery) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, reportData)
 }
 
+// Delete by id
+func (r ReportHttpDelivery) Delete(c echo.Context) error {
+	id := c.QueryParam("id")
+	token := c.Request().Header.Get("Authorization")
+	err := r.interop.Delete(c.Request().Context(), token, id)
+	if err != nil {
+		if errors.Is(err, Report.ErrReportNotFound) {
+			return c.JSON(http.StatusNotFound, err.Error())
+		}
+		return c.JSON(http.StatusUnauthorized, err.Error())
+	}
+	return c.JSON(http.StatusOK, true)
+}
 func NewReportHttpDeliver(api *echo.Group, interop Report.ReportInterop) *ReportHttpDelivery {
 	handler := &ReportHttpDelivery{api: api, interop: interop}
 	api.POST("", handler.Create)
 	api.GET("", handler.Get)
+	api.GET("/id", handler.GetById)
 	api.GET("/completed", handler.GetAllByStatusCompleted)
 	api.GET("/pending", handler.GetAllByStatusPending)
-	api.GET("/id", handler.GetById)
 	api.PUT("", handler.Update)
+	api.DELETE("", handler.Delete)
 	return handler
 }

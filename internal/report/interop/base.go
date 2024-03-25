@@ -2,7 +2,6 @@ package interop
 
 import (
 	"context"
-	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/Report"
 	"github.com/itss-academy/imago/core/domain/auth"
@@ -15,12 +14,14 @@ type ReportInterop struct {
 }
 
 func (r ReportInterop) Create(ctx context.Context, token string, report *Report.Report) error {
-	_, err := r.authUcase.Verify(ctx, token)
+	record, err := r.authUcase.Verify(ctx, token)
 	if err != nil {
 		return err
 	}
-	fmt.Print(r.ucase)
-	report.ID = time.Now().String()
+	report.CreatorID = record.UID
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("20060102150405")
+	report.ID = formattedTime + report.CreatorID
 	data := r.ucase.Create(ctx, report)
 	if data != nil {
 		return data
@@ -61,17 +62,31 @@ func (r ReportInterop) GetAllByStatusPending(ctx context.Context, token string, 
 	}
 	return r.ucase.GetAllByStatusCompleted(ctx, opts)
 }
-func (r ReportInterop) Update(ctx context.Context, token string, reportData *Report.Report) error {
 
+// Update report by id
+func (r ReportInterop) Update(ctx context.Context, token string, report *Report.Report, id string) error {
 	_, err := r.authUcase.Verify(ctx, token)
 	if err != nil {
 		return err
 	}
-	return r.ucase.Update(ctx, reportData)
-
+	//check id exist
+	_, err = r.ucase.GetById(ctx, id)
+	if err != nil {
+		return Report.ErrReportNotFound
+	}
+	return r.ucase.Update(ctx, report, id)
 }
 
-func NewReportInterop(ucase Report.ReportUseCase) *ReportInterop {
-	return &ReportInterop{ucase: ucase}
+// Delete report by id
+func (r ReportInterop) Delete(ctx context.Context, token string, id string) error {
+	_, err := r.authUcase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	return r.ucase.Delete(ctx, id)
+
+}
+func NewReportInterop(ucase Report.ReportUseCase, authUcase auth.AuthUseCase) *ReportInterop {
+	return &ReportInterop{ucase: ucase, authUcase: authUcase}
 
 }

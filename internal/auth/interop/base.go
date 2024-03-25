@@ -2,7 +2,6 @@ package interop
 
 import (
 	"context"
-	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 )
@@ -13,7 +12,6 @@ type AuthInterop struct {
 
 func (a AuthInterop) Create(ctx context.Context, token string, aut *auth.Auth) error {
 	record, err := a.ucase.Verify(ctx, token)
-	fmt.Print(record)
 	if err != nil {
 		return err
 	}
@@ -24,6 +22,10 @@ func (a AuthInterop) Create(ctx context.Context, token string, aut *auth.Auth) e
 }
 
 func (a AuthInterop) GetById(ctx context.Context, token string, id string) (*auth.Auth, error) {
+	_, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
 	return a.ucase.GetById(ctx, id)
 }
 
@@ -50,7 +52,32 @@ func (a AuthInterop) Update(ctx context.Context, token string, auth *auth.Auth) 
 	return a.ucase.Update(ctx, authData)
 }
 
-func (a AuthInterop) ChangeRole(ctx context.Context, token string, roleId string) error {
+func (a AuthInterop) ChangeRole(ctx context.Context, token string, id string) error {
+	record, err := a.ucase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	authData, err := a.ucase.GetById(ctx, id)
+	if err != nil {
+		return err
+	}
+	recordData, err := a.ucase.GetById(ctx, record.UID)
+	if err != nil {
+		return err
+	}
+	if recordData.RoleId != auth.RoleAdmin {
+		return auth.ErrAuthNotAuthorized
+	}
+
+	if authData.RoleId == auth.RoleAdmin {
+		authData.RoleId = auth.RoleUser
+	} else {
+		authData.RoleId = auth.RoleAdmin
+	}
+	return a.ucase.Update(ctx, authData)
+}
+
+func (a AuthInterop) Delete(ctx context.Context, token string, id string) error {
 	record, err := a.ucase.Verify(ctx, token)
 	if err != nil {
 		return err
@@ -58,15 +85,10 @@ func (a AuthInterop) ChangeRole(ctx context.Context, token string, roleId string
 	authData, err := a.ucase.GetById(ctx, record.UID)
 	if err != nil {
 		return err
-
 	}
 	if authData.RoleId != auth.RoleAdmin {
 		return auth.ErrAuthNotAuthorized
 	}
-	return a.ucase.Update(ctx, authData)
-}
-
-func (a AuthInterop) Delete(ctx context.Context, token string, id string) error {
 	return a.ucase.Delete(ctx, id)
 }
 

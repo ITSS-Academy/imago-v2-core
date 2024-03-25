@@ -8,3 +8,4 @@ firebase:
 
 database:
   dsn: "postgres://beheo:ANIFHIdndwwid0139@localhost:5432/postgres"
+  # dsn: "postgres://beheo:ANIFHIdndwwid0139@localhost:5433/imago"
