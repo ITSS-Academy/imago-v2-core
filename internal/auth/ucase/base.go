@@ -2,11 +2,11 @@ package ucase
 
 import (
 	"context"
-	firebaseAuth "firebase.google.com/go/v4/auth"
 	"fmt"
+
+	firebaseAuth "firebase.google.com/go/v4/auth"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
-	"github.com/pkg/errors"
 )
 
 type AuthUseCase struct {
@@ -65,24 +65,12 @@ func (a AuthUseCase) Delete(ctx context.Context, id string) error {
 }
 
 func (a AuthUseCase) Verify(ctx context.Context, token string) (*firebaseAuth.UserRecord, error) {
-	if a.authClient == nil {
-		return nil, errors.New("authClient is nil")
-	}
-
 	idToken, err := a.authClient.VerifyIDToken(ctx, token)
+	fmt.Print(idToken)
 	if err != nil {
 		return nil, err
 	}
-
-	if idToken == nil {
-		return nil, errors.New("idToken is nil")
-	}
-
 	record, err := a.authClient.GetUser(ctx, idToken.UID)
-	if err != nil {
-		return nil, err
-	}
-
 	fmt.Print(record)
 	return record, nil
 }

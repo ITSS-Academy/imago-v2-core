@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	firebaseAuth "firebase.google.com/go/v4/auth"
+	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/Report"
 )
@@ -14,6 +15,7 @@ type ReportUseCase struct {
 
 func (r ReportUseCase) Create(ctx context.Context, reportData *Report.Report) error {
 	err := r.Validate(reportData)
+	fmt.Print(reportData)
 	if err != nil {
 		return err
 	}

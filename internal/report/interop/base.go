@@ -2,6 +2,7 @@ package interop
 
 import (
 	"context"
+	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/Report"
 	"github.com/itss-academy/imago/core/domain/auth"
@@ -18,6 +19,7 @@ func (r ReportInterop) Create(ctx context.Context, token string, report *Report.
 	if err != nil {
 		return err
 	}
+	fmt.Print(r.ucase)
 	report.ID = time.Now().String()
 	data := r.ucase.Create(ctx, report)
 	if data != nil {
