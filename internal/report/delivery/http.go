@@ -86,8 +86,7 @@ func (r ReportHttpDelivery) Get(c echo.Context) error {
 
 }
 
-// GetAllByStatusCompleted
-func (r ReportHttpDelivery) GetAllByStatusCompleted(c echo.Context) error {
+func (r ReportHttpDelivery) GetAllByStatusApproved(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	query := &common.QueryOpts{}
 	pageStr := c.QueryParam("page")
@@ -175,8 +174,7 @@ func (r ReportHttpDelivery) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, reportData)
 }
 
-// ChangeStatusCompleted
-func (r ReportHttpDelivery) ChangeStatusCompleted(c echo.Context) error {
+func (r ReportHttpDelivery) ChangeStatusApproved(c echo.Context) error {
 	id := c.QueryParam("id")
 	token := c.Request().Header.Get("Authorization")
 	err := r.interop.ChangeStatusApproved(c.Request().Context(), token, id, report.StatusApproved)
@@ -189,7 +187,6 @@ func (r ReportHttpDelivery) ChangeStatusCompleted(c echo.Context) error {
 	return c.JSON(http.StatusOK, true)
 }
 
-// ChangeStatusRejected
 func (r ReportHttpDelivery) ChangeStatusRejected(c echo.Context) error {
 	id := c.QueryParam("id")
 	token := c.Request().Header.Get("Authorization")
@@ -222,10 +219,10 @@ func NewReportHttpDeliver(api *echo.Group, interop report.ReportInterop) *Report
 	api.POST("", handler.Create)
 	api.GET("", handler.Get)
 	api.GET("/id", handler.GetById)
-	api.GET("/approved", handler.GetAllByStatusCompleted)
+	api.GET("/approved", handler.GetAllByStatusApproved)
 	api.GET("/pending", handler.GetAllByStatusPending)
 	api.PUT("", handler.Update)
-	api.PUT("/approved", handler.ChangeStatusCompleted)
+	api.PUT("/approved", handler.ChangeStatusApproved)
 	api.PUT("/rejected", handler.ChangeStatusRejected)
 	api.DELETE("", handler.Delete)
 	return handler
