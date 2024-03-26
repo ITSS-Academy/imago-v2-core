@@ -2,10 +2,11 @@ package repo
 
 import (
 	"context"
+	"math"
+
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/post"
 	"gorm.io/gorm"
-	"math"
 )
 
 type PostRepository struct {
@@ -50,7 +51,7 @@ func (p PostRepository) List(ctx context.Context, opts *common.QueryOpts) (*comm
 	page := int(math.Ceil(float64(count) / float64(opts.Size)))
 	return &common.ListResult[*post.Post]{
 		Data:    result,
-		EndPage: int64(page),
+		EndPage: int(page),
 	}, nil
 }
 

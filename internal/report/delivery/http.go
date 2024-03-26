@@ -7,27 +7,27 @@ import (
 	"strconv"
 
 	"github.com/itss-academy/imago/core/common"
-	"github.com/itss-academy/imago/core/domain/Report"
+	"github.com/itss-academy/imago/core/domain/report"
 	"github.com/labstack/echo/v4"
 )
 
 type ReportHttpDelivery struct {
 	api     *echo.Group
-	interop Report.ReportInterop
+	interop report.ReportInterop
 }
 
 func (r ReportHttpDelivery) Create(c echo.Context) error {
-	reportData := &Report.Report{}
+	reportData := &report.Report{}
 	if err := c.Bind(reportData); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	token := c.Request().Header.Get("Authorization")
 	err := r.interop.Create(c.Request().Context(), token, reportData)
 	if err != nil {
-		if errors.Is(err, Report.ErrCreatorIDEmpty) || errors.Is(err, Report.ErrReasonEmpty) || errors.Is(err, Report.ErrContentEmpty) || errors.Is(err, Report.ErrTypeEmpty) || errors.Is(err, Report.ErrTypeIDEmpty) {
+		if errors.Is(err, report.ErrCreatorIDEmpty) || errors.Is(err, report.ErrReasonEmpty) || errors.Is(err, report.ErrContentEmpty) || errors.Is(err, report.ErrTypeEmpty) || errors.Is(err, report.ErrTypeIDEmpty) {
 			return c.JSON(http.StatusBadRequest, err.Error())
 		}
-		if errors.Is(err, Report.ErrReportNotCreated) {
+		if errors.Is(err, report.ErrReportNotCreated) {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 		return c.JSON(http.StatusUnauthorized, err.Error())
@@ -41,7 +41,7 @@ func (r ReportHttpDelivery) GetById(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	reportData, err := r.interop.GetById(c.Request().Context(), token, id)
 	if err != nil {
-		if errors.Is(err, Report.ErrReportNotFound) {
+		if errors.Is(err, report.ErrReportNotFound) {
 			return c.JSON(http.StatusNotFound, err.Error())
 		}
 		return c.JSON(http.StatusUnauthorized, err.Error())
@@ -77,7 +77,7 @@ func (r ReportHttpDelivery) Get(c echo.Context) error {
 	}
 	reportData, err := r.interop.Get(c.Request().Context(), token, query)
 	if err != nil {
-		if errors.Is(err, Report.ErrReportNotFound) {
+		if errors.Is(err, report.ErrReportNotFound) {
 			return c.JSON(http.StatusNotFound, err.Error())
 		}
 		return c.JSON(http.StatusUnauthorized, err.Error())
@@ -86,8 +86,7 @@ func (r ReportHttpDelivery) Get(c echo.Context) error {
 
 }
 
-// GetAllByStatusCompleted
-func (r ReportHttpDelivery) GetAllByStatusCompleted(c echo.Context) error {
+func (r ReportHttpDelivery) GetAllByStatusApproved(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	query := &common.QueryOpts{}
 	pageStr := c.QueryParam("page")
@@ -112,9 +111,9 @@ func (r ReportHttpDelivery) GetAllByStatusCompleted(c echo.Context) error {
 		}
 		query.Size = size
 	}
-	reportData, err := r.interop.GetAllByStatusCompleted(c.Request().Context(), token, query)
+	reportData, err := r.interop.GetAllByStatusApproved(c.Request().Context(), token, query)
 	if err != nil {
-		if errors.Is(err, Report.ErrReportNotFound) {
+		if errors.Is(err, report.ErrReportNotFound) {
 			return c.JSON(http.StatusNotFound, err.Error())
 		}
 		return c.JSON(http.StatusUnauthorized, err.Error())
@@ -150,7 +149,7 @@ func (r ReportHttpDelivery) GetAllByStatusPending(c echo.Context) error {
 	}
 	reportData, err := r.interop.GetAllByStatusPending(c.Request().Context(), token, query)
 	if err != nil {
-		if errors.Is(err, Report.ErrReportNotFound) {
+		if errors.Is(err, report.ErrReportNotFound) {
 			return c.JSON(http.StatusNotFound, err.Error())
 		}
 		return c.JSON(http.StatusUnauthorized, err.Error())
@@ -160,19 +159,46 @@ func (r ReportHttpDelivery) GetAllByStatusPending(c echo.Context) error {
 
 func (r ReportHttpDelivery) Update(c echo.Context) error {
 	id := c.QueryParam("id")
-	reportData := &Report.Report{}
+	reportData := &report.Report{}
 	if err := c.Bind(reportData); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	token := c.Request().Header.Get("Authorization")
 	err := r.interop.Update(c.Request().Context(), token, reportData, id)
 	if err != nil {
-		if errors.Is(err, Report.ErrReportNotFound) {
+		if errors.Is(err, report.ErrReportNotFound) {
 			return c.JSON(http.StatusNotFound, err.Error())
 		}
 		return c.JSON(http.StatusUnauthorized, err.Error())
 	}
 	return c.JSON(http.StatusOK, reportData)
+}
+
+func (r ReportHttpDelivery) ChangeStatusApproved(c echo.Context) error {
+	id := c.QueryParam("id")
+	token := c.Request().Header.Get("Authorization")
+	err := r.interop.ChangeStatusApproved(c.Request().Context(), token, id, report.StatusApproved)
+	if err != nil {
+		if errors.Is(err, report.ErrReportNotFound) {
+			return c.JSON(http.StatusNotFound, err.Error())
+		}
+		return c.JSON(http.StatusUnauthorized, err.Error())
+	}
+	return c.JSON(http.StatusOK, true)
+}
+
+func (r ReportHttpDelivery) ChangeStatusRejected(c echo.Context) error {
+	id := c.QueryParam("id")
+	token := c.Request().Header.Get("Authorization")
+	err := r.interop.ChangeStatusRejected(c.Request().Context(), token, id, report.StatusRejected)
+	if err != nil {
+		if errors.Is(err, report.ErrReportNotFound) {
+			return c.JSON(http.StatusNotFound, err.Error())
+		}
+		return c.JSON(http.StatusUnauthorized, err.Error())
+	}
+	return c.JSON(http.StatusOK, true)
+
 }
 
 // Delete by id
@@ -181,21 +207,23 @@ func (r ReportHttpDelivery) Delete(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")
 	err := r.interop.Delete(c.Request().Context(), token, id)
 	if err != nil {
-		if errors.Is(err, Report.ErrReportNotFound) {
+		if errors.Is(err, report.ErrReportNotFound) {
 			return c.JSON(http.StatusNotFound, err.Error())
 		}
 		return c.JSON(http.StatusUnauthorized, err.Error())
 	}
 	return c.JSON(http.StatusOK, true)
 }
-func NewReportHttpDeliver(api *echo.Group, interop Report.ReportInterop) *ReportHttpDelivery {
+func NewReportHttpDeliver(api *echo.Group, interop report.ReportInterop) *ReportHttpDelivery {
 	handler := &ReportHttpDelivery{api: api, interop: interop}
 	api.POST("", handler.Create)
 	api.GET("", handler.Get)
 	api.GET("/id", handler.GetById)
-	api.GET("/completed", handler.GetAllByStatusCompleted)
+	api.GET("/approved", handler.GetAllByStatusApproved)
 	api.GET("/pending", handler.GetAllByStatusPending)
 	api.PUT("", handler.Update)
+	api.PUT("/approved", handler.ChangeStatusApproved)
+	api.PUT("/rejected", handler.ChangeStatusRejected)
 	api.DELETE("", handler.Delete)
 	return handler
 }

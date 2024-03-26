@@ -2,10 +2,11 @@ package repo
 
 import (
 	"context"
+	"math"
+
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 	"gorm.io/gorm"
-	"math"
 )
 
 type AuthRepository struct {
@@ -37,7 +38,7 @@ func (a AuthRepository) Get(ctx context.Context, opts *common.QueryOpts) (*commo
 		return nil, tx.Error
 	}
 	pageNum := int(math.Ceil(float64(count) / float64(limit)))
-	return &common.ListResult[*auth.Auth]{Data: authData, EndPage: int64(pageNum)}, tx.Error
+	return &common.ListResult[*auth.Auth]{Data: authData, EndPage: int(pageNum)}, tx.Error
 }
 
 func (a AuthRepository) Update(ctx context.Context, auth *auth.Auth) error {
