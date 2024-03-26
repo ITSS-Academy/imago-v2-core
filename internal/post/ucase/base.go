@@ -17,12 +17,17 @@ func (p PostUseCase) Create(ctx context.Context, data *post.Post) error {
 	if len(data.PhotoUrl) == 0 {
 		return post.ErrPostRequiredPhoto
 	}
+<<<<<<< HEAD
 
 	err := p.postRepo.Create(ctx, data)
 	if err != nil {
 		return err
 	}
 	return nil
+=======
+	return p.postRepo.Create(ctx, data)
+
+>>>>>>> origin/master
 }
 
 func (p PostUseCase) List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {

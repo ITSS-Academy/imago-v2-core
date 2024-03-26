@@ -124,10 +124,15 @@ func main() {
 	profilePkgDelivery.NewProfileHttpDelivery(profileApi, profileInterop)
 	commentPkgDelivery.NewCommentHttpDelivery(commentApi, commentInterop)
 
+
+	postApi := e.Group("/v2/post")
+	postPkgDelivery.NewPostHttpDelivery(postApi, postInterop)
+
 	reportApi := e.Group("/v2/report")
 	reportPkgDelivery.NewReportHttpDeliver(reportApi, reportInterop)
 	postApi := e.Group("/v2/post")
 	postPkgDelivery.NewPostHttpDelivery(postApi, postInterop)
+
 
 	// start server
 	_ = e.Start(fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port")))
