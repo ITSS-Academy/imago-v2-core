@@ -1,4 +1,4 @@
-package Report
+package report
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type ReportRepository interface {
 	Create(ctx context.Context, report *Report) error
 	Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetById(ctx context.Context, id string) (*Report, error)
-	GetAllByStatusCompleted(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
+	GetAllByStatusApproved(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetAllByStatusPending(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	Update(ctx context.Context, report *Report, id string) error
 	Delete(ctx context.Context, id string) error
@@ -31,7 +31,7 @@ type ReportUseCase interface {
 	Create(ctx context.Context, report *Report) error
 	Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetById(ctx context.Context, id string) (*Report, error)
-	GetAllByStatusCompleted(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
+	GetAllByStatusApproved(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetAllByStatusPending(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	Update(ctx context.Context, report *Report, id string) error
 	Delete(ctx context.Context, id string) error
@@ -41,11 +41,17 @@ type ReportInterop interface {
 	Create(ctx context.Context, token string, report *Report) error
 	Get(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetById(ctx context.Context, token string, id string) (*Report, error)
-	GetAllByStatusCompleted(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Report], error)
+	GetAllByStatusApproved(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	GetAllByStatusPending(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Report], error)
 	Update(ctx context.Context, token string, report *Report, id string) error
+	ChangeStatusApproved(ctx context.Context, token string, id string, status string) error
+	ChangeStatusRejected(ctx context.Context, token string, id string, status string) error
 	Delete(ctx context.Context, token string, id string) error
 }
+
+const StatusPending = "pending"
+const StatusApproved = "approved"
+const StatusRejected = "rejected"
 
 var (
 	ErrReportNotFound    = errors.New("report not found")

@@ -7,5 +7,4 @@ firebase:
   projectid: "itss-imago-0000"
 
 database:
-  dsn: "postgres://beheo:ANIFHIdndwwid0139@localhost:5432/postgres"
-#  dsn: "postgres://beheo:ANIFHIdndwwid0139@localhost:5432/imago"
+ dsn: "postgres://beheo:ANIFHIdndwwid0139@localhost:5432/imago"

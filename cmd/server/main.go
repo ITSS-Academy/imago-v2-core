@@ -4,11 +4,11 @@ import (
 	"context"
 	firebase "firebase.google.com/go/v4"
 	"fmt"
-	"github.com/itss-academy/imago/core/domain/Report"
-
 	"github.com/itss-academy/imago/core/domain/auth"
 	"github.com/itss-academy/imago/core/domain/comment"
+	"github.com/itss-academy/imago/core/domain/post"
 	"github.com/itss-academy/imago/core/domain/profile"
+	"github.com/itss-academy/imago/core/domain/report"
 	authPkgDelivery "github.com/itss-academy/imago/core/internal/auth/delivery"
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
 	authPkgRepo "github.com/itss-academy/imago/core/internal/auth/repo"
@@ -29,6 +29,10 @@ import (
 	commentPkgUcase "github.com/itss-academy/imago/core/internal/comment/ucase"
 	"log"
 
+	postPkgDelivery "github.com/itss-academy/imago/core/internal/post/delivery"
+	postPkgInterop "github.com/itss-academy/imago/core/internal/post/interop"
+	postPkgRepo "github.com/itss-academy/imago/core/internal/post/repo"
+	postPkgUcase "github.com/itss-academy/imago/core/internal/post/ucase"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
@@ -77,12 +81,19 @@ func main() {
 	var authUsecase auth.AuthUseCase
 	var authInterop auth.AuthInterop
 
-	var reportRepo Report.ReportRepository
-	var reportUsecase Report.ReportUseCase
-	var reportInterop Report.ReportInterop
+	var reportRepo report.ReportRepository
+	var reportUsecase report.ReportUseCase
+	var reportInterop report.ReportInterop
 	var profileRepo profile.ProfileRepository
 	var profileUsecase profile.ProfileUseCase
 	var profileInterop profile.ProfileInterop
+	var postRepo post.PostRepository
+	var postUsecase post.PostUseCase
+	var postInterop post.PostInterop
+
+	postRepo = postPkgRepo.NewPostRepository(db)
+	postUsecase = postPkgUcase.NewPostUseCase(postRepo)
+	postInterop = postPkgInterop.NewPostBaseInterop(postUsecase, authUsecase)
 
 	authRepo = authPkgRepo.NewAuthRepository(db)
 	authUsecase = authPkgUcase.NewAuthUseCase(authRepo, authClient)
@@ -111,6 +122,9 @@ func main() {
 	authPkgDelivery.NewAuthHttpDelivery(authApi, authInterop)
 	profilePkgDelivery.NewProfileHttpDelivery(profileApi, profileInterop)
 	commentPkgDelivery.NewCommentHttpDelivery(commentApi, commentInterop)
+
+	postApi := e.Group("/v2/post")
+	postPkgDelivery.NewPostHttpDelivery(postApi, postInterop)
 
 	reportApi := e.Group("/v2/report")
 	reportPkgDelivery.NewReportHttpDeliver(reportApi, reportInterop)
