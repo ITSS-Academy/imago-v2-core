@@ -2,7 +2,6 @@ package ucase
 
 import (
 	"context"
-	"errors"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/comment"
 )
@@ -38,7 +37,7 @@ func (c CommentUseCase) GetCommentById(ctx context.Context, id string) (*comment
 func (c CommentUseCase) GetCommentByPostId(ctx context.Context, postId string, opts *common.QueryOpts) (*common.ListResult[*comment.Comment], error) {
 	commentData, err := c.repo.GetCommentByPostId(ctx, postId, opts)
 	if err != nil {
-		return nil, err
+		return nil, comment.ErrPostCommentEmpty
 	}
 	return commentData, nil
 }
@@ -76,7 +75,7 @@ func (c CommentUseCase) Validate(commentData *comment.Comment) error {
 		return comment.ErrCommentPostId
 	}
 	if commentData.CreatorID == "" {
-		return errors.New("comment creator id is empty")
+		return comment.ErrCommentCreatorId
 	}
 	if commentData.Content == "" {
 		return comment.ErrCommentContentEmpty
