@@ -47,7 +47,6 @@ func (p PostHttpDelivery) List(c echo.Context) error {
 }
 
 func (p PostHttpDelivery) Create(c echo.Context) error {
-
 	postData := &post.Post{}
 	if err := c.Bind(postData); err != nil {
 		return c.NoContent(http.StatusBadRequest)
@@ -58,6 +57,9 @@ func (p PostHttpDelivery) Create(c echo.Context) error {
 	if err != nil {
 		if errors.Is(err, post.ErrPostRequiredContent) || errors.Is(err, post.ErrPostRequiredPhoto) {
 			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+		if errors.Is(err, post.ErrPostNotCreated) {
+			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
 	return c.JSON(http.StatusCreated, postData)

@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	firebase "firebase.google.com/go/v4"
 	"fmt"
+
+	firebase "firebase.google.com/go/v4"
 	"github.com/itss-academy/imago/core/domain/auth"
 	"github.com/itss-academy/imago/core/domain/comment"
 	"github.com/itss-academy/imago/core/domain/post"
@@ -27,12 +28,14 @@ import (
 	commentPkgInterop "github.com/itss-academy/imago/core/internal/comment/interop"
 	commentPkgRepo "github.com/itss-academy/imago/core/internal/comment/repo"
 	commentPkgUcase "github.com/itss-academy/imago/core/internal/comment/ucase"
-	"log"
 
 	postPkgDelivery "github.com/itss-academy/imago/core/internal/post/delivery"
 	postPkgInterop "github.com/itss-academy/imago/core/internal/post/interop"
 	postPkgRepo "github.com/itss-academy/imago/core/internal/post/repo"
 	postPkgUcase "github.com/itss-academy/imago/core/internal/post/ucase"
+
+	"log"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
@@ -91,10 +94,6 @@ func main() {
 	var postUsecase post.PostUseCase
 	var postInterop post.PostInterop
 
-	postRepo = postPkgRepo.NewPostRepository(db)
-	postUsecase = postPkgUcase.NewPostUseCase(postRepo)
-	postInterop = postPkgInterop.NewPostBaseInterop(postUsecase, authUsecase)
-
 	authRepo = authPkgRepo.NewAuthRepository(db)
 	authUsecase = authPkgUcase.NewAuthUseCase(authRepo, authClient)
 	authInterop = authPkgInterop.NewAuthInterop(authUsecase)
@@ -105,6 +104,10 @@ func main() {
 	profileRepo = profilePkgRepo.NewProfileRepository(db)
 	profileUsecase = profilePkgUcase.NewProfileUseCase(profileRepo)
 	profileInterop = profilePkgInterop.NewProfileInterop(profileUsecase, authUsecase)
+
+	postRepo = postPkgRepo.NewPostRepository(db)
+	postUsecase = postPkgUcase.NewPostUseCase(postRepo)
+	postInterop = postPkgInterop.NewPostBaseInterop(postUsecase, authUsecase)
 
 	var commentRepo comment.CommentRepository
 	var commentUsecase comment.CommentUseCase

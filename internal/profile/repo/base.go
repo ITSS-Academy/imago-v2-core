@@ -48,27 +48,36 @@ func (p ProfileRepository) GetAllAuthNoProfile(ctx context.Context, opts *common
 }
 
 func (p ProfileRepository) GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error) {
-	auth := &auth.Auth{}
-	profile := &profile.Profile{}
-	limit := opts.Size
-	offset := opts.Size * (opts.Page - 1)
-	var result []*any
-	if auth.ID == profile.UID {
-		result = append(result)
-	}
-	tx := p.db.Find(&result).Limit(limit).Offset(offset)
+	auths := []*auth.Auth{}
+	profiles := []*profile.Profile{}
+	tx := p.db.Find(&auths)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
+	tx = p.db.Find(&profiles)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var result []*any
+	for i := 0; i < len(auths); i++ {
+		for j := 0; j < len(profiles); j++ {
+			if auths[i].ID == profiles[j].UID {
+				result = append(result)
+				break
+			}
+		}
+
+	}
 	count := int64(0)
+	tx = p.db.Model(&auth.Auth{}).Count(&count)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	pageNum := int64(0)
 	if count > 0 {
-		pageNum = int64(math.Ceil(float64(count) / float64(limit)))
+		pageNum = int64(math.Ceil(float64(count) / float64(opts.Size)))
 	}
-	return &common.ListResult[*any]{Data: result, EndPage: int(pageNum)}, tx.Error
+	return &common.ListResult[*any]{Data: result, EndPage: int(pageNum)}, nil
 }
 
 func NewProfileRepository(db *gorm.DB) *ProfileRepository {
