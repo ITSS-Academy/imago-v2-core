@@ -14,11 +14,11 @@ type PostBaseInterop struct {
 	authUseCase auth.AuthUseCase
 }
 
-func (p PostBaseInterop) List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
+func (p *PostBaseInterop) List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
 	return p.postUseCase.List(ctx, opts)
 }
 
-func (p PostBaseInterop) Create(ctx context.Context, token string, data *post.Post) error {
+func (p *PostBaseInterop) Create(ctx context.Context, token string, post *post.Post) error {
 	record, err := p.authUseCase.Verify(ctx, token)
 	if err != nil {
 		return err

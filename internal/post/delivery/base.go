@@ -58,9 +58,6 @@ func (p PostHttpDelivery) Create(c echo.Context) error {
 		if errors.Is(err, post.ErrPostRequiredContent) || errors.Is(err, post.ErrPostRequiredPhoto) {
 			return c.JSON(http.StatusBadRequest, err.Error())
 		}
-		if errors.Is(err, post.ErrPostNotCreated) {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
 	}
 	return c.JSON(http.StatusCreated, postData)
 }
