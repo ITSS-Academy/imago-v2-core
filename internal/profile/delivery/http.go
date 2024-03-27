@@ -127,6 +127,41 @@ func (p ProfileHttpDelivery) Unfollow(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Unfollowed")
 }
 
+func (p ProfileHttpDelivery) GetAllAuthNoProfile(e echo.Context) error {
+	token := e.Request().Header.Get("Authorization")
+	query := &common.QueryOpts{}
+	pageStr := e.QueryParam("page")
+	if pageStr == "" {
+		return e.JSON(http.StatusBadRequest, "page is empty")
+	}
+	sizeStr := e.QueryParam("size")
+	if sizeStr == "" {
+		return e.JSON(http.StatusBadRequest, "size is empty")
+	}
+	if pageStr != "" {
+		page, err := strconv.ParseInt(pageStr, 10, 64)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, "page is not a number")
+		}
+		query.Page = int(page)
+	}
+	if sizeStr != "" {
+		size, err := strconv.ParseInt(sizeStr, 10, 64)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, "size is not a number")
+		}
+		query.Size = int(size)
+	}
+	data, err := p.interop.GetAllAuthNoProfile(e.Request().Context(), token, query)
+	if err != nil {
+		if errors.Is(err, profile.ErrProfileNotFound) {
+			return e.JSON(http.StatusNotFound, err.Error())
+		}
+		return e.JSON(http.StatusUnauthorized, err.Error())
+	}
+	return e.JSON(http.StatusOK, data)
+}
+
 func (p ProfileHttpDelivery) GetAllAuthProfile(e echo.Context) error {
 	token := e.Request().Header.Get("Authorization")
 	query := &common.QueryOpts{}
@@ -170,6 +205,7 @@ func NewProfileHttpDelivery(api *echo.Group, interop profile.ProfileInterop) *Pr
 	api.GET("/all", handler.GetAll)
 	api.GET("", handler.GetById)
 	api.GET("/mine", handler.GetMine)
+	api.GET("/authnoprofile", handler.GetAllAuthNoProfile)
 	api.GET("/authprofile", handler.GetAllAuthProfile)
 	api.POST("/mine", handler.Create)
 	api.PUT("/mine", handler.Update)
