@@ -169,6 +169,24 @@ func (p ProfileInterop) Unfollow(ctx context.Context, token string, profileId st
 	return nil
 }
 
+func (p ProfileInterop) GetAllExceptMine(ctx context.Context, token string) ([]*profile.Profile, error) {
+	record, err := p.authucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	profiles, err := p.ucase.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var result []*profile.Profile
+	for _, profile := range profiles {
+		if profile.UID != record.UID {
+			result = append(result, profile)
+		}
+	}
+	return result, nil
+}
+
 func NewProfileInterop(ucase profile.ProfileUseCase, authucase auth.AuthUseCase) *ProfileInterop {
 	return &ProfileInterop{
 		ucase:     ucase,

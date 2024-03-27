@@ -53,6 +53,7 @@ type ProfileInterop interface {
 	Update(ctx context.Context, token string, profile *Profile) error
 	Follow(ctx context.Context, token string, profileId string, profileOtherId string) error
 	Unfollow(ctx context.Context, token string, profileId string, profileOtherId string) error
+	GetAllExceptMine(ctx context.Context, token string) ([]*Profile, error)
 }
 
 var (

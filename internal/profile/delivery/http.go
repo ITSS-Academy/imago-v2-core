@@ -124,6 +124,20 @@ func (p ProfileHttpDelivery) Unfollow(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Unfollowed")
 }
 
+func (p ProfileHttpDelivery) GetAllExceptMine(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	if token == "" {
+		return c.JSON(http.StatusBadRequest, "token is empty")
+	}
+
+	profiles, err := p.interop.GetAllExceptMine(c.Request().Context(), token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, profiles)
+
+}
+
 func NewProfileHttpDelivery(api *echo.Group, interop profile.ProfileInterop) *ProfileHttpDelivery {
 	handler := &ProfileHttpDelivery{
 		api:     api,
@@ -132,6 +146,7 @@ func NewProfileHttpDelivery(api *echo.Group, interop profile.ProfileInterop) *Pr
 	api.GET("/all", handler.GetAll)
 	api.GET("", handler.GetById)
 	api.GET("/mine", handler.GetMine)
+	api.GET("/allExceptMine", handler.GetAllExceptMine)
 	api.POST("/mine", handler.Create)
 	api.PUT("/mine", handler.Update)
 	api.PUT("/follow", handler.Follow)
