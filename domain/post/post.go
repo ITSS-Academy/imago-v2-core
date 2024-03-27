@@ -43,7 +43,7 @@ type Post struct {
 
 type PostRepository interface {
 	Create(ctx context.Context, post *Post) error
-	//GetById(ctx context.Context, id string) (*Post, error)
+	GetById(ctx context.Context, id string) (*Post, error)
 	//GetByUid(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, post *Post) error
@@ -53,7 +53,7 @@ type PostRepository interface {
 
 type PostUseCase interface {
 	Create(ctx context.Context, post *Post) error
-	//GetById(ctx context.Context, id string) (*Post, error)
+	GetById(ctx context.Context, id string) (*Post, error)
 	//GetByUid(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, post *Post) error
@@ -63,7 +63,7 @@ type PostUseCase interface {
 
 type PostInterop interface {
 	Create(ctx context.Context, token string, post *Post) error
-	//GetById(ctx context.Context, token string, id string) (*Post, error)
+	GetById(ctx context.Context, token string, id string) (*Post, error)
 	//GetByUid(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, token string, post *Post) error

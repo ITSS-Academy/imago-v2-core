@@ -36,9 +36,15 @@ func (p *PostBaseInterop) Create(ctx context.Context, token string, post *post.P
 		post.HashTag = make([]string, 0)
 	}
 
-	post.CreatedAt = time.Now()
-
+	//post.CreatedAt = time.Now()
 	return p.postUseCase.Create(ctx, post)
+}
+func (p *PostBaseInterop) GetById(ctx context.Context, token string, id string) (*post.Post, error) {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return p.postUseCase.GetById(ctx, id)
 }
 
 func NewPostBaseInterop(postUseCase post.PostUseCase, authUcase auth.AuthUseCase) *PostBaseInterop {

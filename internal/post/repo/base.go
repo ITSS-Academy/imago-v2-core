@@ -18,17 +18,18 @@ func (p PostRepository) Create(ctx context.Context, post *post.Post) error {
 	return tx.Error
 }
 
-//func (p PostRepository) GetById(ctx context.Context, id string) (*post.Post, error) {
-//	found := &post.Post{}
-//	tx := p.db.WithContext(ctx).Where("id = ?", id).First(&found)
-//	if tx.Error != nil {
-//		if tx.Error.Error() == "not found" {
-//			return nil, post.ErrPostNotFound
-//		}
-//		return nil, tx.Error
-//	}
-//	return found, nil
-//}
+func (p PostRepository) GetById(ctx context.Context, id string) (*post.Post, error) {
+	found := &post.Post{}
+	tx := p.db.Where("id = ?", id).First(found)
+	if tx.Error != nil {
+		if tx.Error.Error() == "not found" {
+			return nil, post.ErrPostNotFound
+		}
+		return nil, tx.Error
+	}
+	return found, nil
+}
+
 //
 //func (p PostRepository) GetByUid(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
 //
@@ -50,7 +51,7 @@ func (p PostRepository) List(ctx context.Context, opts *common.QueryOpts) (*comm
 	page := int(math.Ceil(float64(count) / float64(opts.Size)))
 	return &common.ListResult[*post.Post]{
 		Data:    result,
-		EndPage: int64(page),
+		EndPage: int(int64(page)),
 	}, nil
 }
 

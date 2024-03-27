@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"errors"
+	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/post"
 	"github.com/labstack/echo/v4"
@@ -45,6 +46,23 @@ func (p PostHttpDelivery) List(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, post)
 }
+func (p PostHttpDelivery) GetById(c echo.Context) error {
+
+	token := c.Request().Header.Get("Authorization")
+	fmt.Println(token)
+	if token == "" {
+		return c.JSON(http.StatusUnauthorized, "token is empty")
+	}
+	id := c.QueryParam("id")
+	postData, err := p.interop.GetById(c.Request().Context(), token, id)
+	if err != nil {
+		if errors.Is(err, post.ErrPostNotFound) {
+			return c.JSON(http.StatusNotFound, err.Error())
+		}
+		return c.JSON(http.StatusUnauthorized, err.Error())
+	}
+	return c.JSON(http.StatusOK, postData)
+}
 
 func (p PostHttpDelivery) Create(c echo.Context) error {
 
@@ -52,13 +70,15 @@ func (p PostHttpDelivery) Create(c echo.Context) error {
 	if err := c.Bind(postData); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
+
 	token := c.Request().Header.Get("Authorization")
 	err := p.interop.Create(c.Request().Context(), token, postData)
-
+	fmt.Println(err)
 	if err != nil {
 		if errors.Is(err, post.ErrPostRequiredContent) || errors.Is(err, post.ErrPostRequiredPhoto) {
 			return c.JSON(http.StatusBadRequest, err.Error())
 		}
+		return c.JSON(http.StatusUnauthorized, err.Error())
 	}
 	return c.JSON(http.StatusCreated, postData)
 }
@@ -67,5 +87,6 @@ func NewPostHttpDelivery(api *echo.Group, interop post.PostInterop) *PostHttpDel
 	handler := &PostHttpDelivery{api: api, interop: interop}
 	api.POST("", handler.Create)
 	api.GET("/all", handler.List)
+	api.GET("", handler.GetById)
 	return handler
 }

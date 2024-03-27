@@ -8,8 +8,8 @@ import (
 
 	"github.com/itss-academy/imago/core/domain/auth"
 	"github.com/itss-academy/imago/core/domain/comment"
-	"github.com/itss-academy/imago/core/domain/profile"
 	"github.com/itss-academy/imago/core/domain/post"
+	"github.com/itss-academy/imago/core/domain/profile"
 	authPkgDelivery "github.com/itss-academy/imago/core/internal/auth/delivery"
 	authPkgInterop "github.com/itss-academy/imago/core/internal/auth/interop"
 	authPkgRepo "github.com/itss-academy/imago/core/internal/auth/repo"
@@ -124,15 +124,11 @@ func main() {
 	profilePkgDelivery.NewProfileHttpDelivery(profileApi, profileInterop)
 	commentPkgDelivery.NewCommentHttpDelivery(commentApi, commentInterop)
 
-
 	postApi := e.Group("/v2/post")
 	postPkgDelivery.NewPostHttpDelivery(postApi, postInterop)
 
 	reportApi := e.Group("/v2/report")
 	reportPkgDelivery.NewReportHttpDeliver(reportApi, reportInterop)
-	postApi := e.Group("/v2/post")
-	postPkgDelivery.NewPostHttpDelivery(postApi, postInterop)
-
 
 	// start server
 	_ = e.Start(fmt.Sprintf("%s:%s", viper.GetString("server.host"), viper.GetString("server.port")))
