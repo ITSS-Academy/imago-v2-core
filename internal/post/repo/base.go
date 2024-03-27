@@ -14,7 +14,6 @@ type PostRepository struct {
 }
 
 func (p PostRepository) Create(ctx context.Context, post *post.Post) error {
-
 	tx := p.db.Create(post)
 	return tx.Error
 }
@@ -54,6 +53,11 @@ func (p PostRepository) List(ctx context.Context, opts *common.QueryOpts) (*comm
 		EndPage: int(page),
 	}, nil
 }
+
+//func (p PostRepository) UpdatePostComment(ctx context.Context, id string, comment []string) error {
+//	tx := p.db.WithContext(ctx).Model(&post.Post{}).Where("id = ?", id).Update("comment", comment)
+//	return tx.Error
+//}
 
 func NewPostRepository(db *gorm.DB) *PostRepository {
 	err := db.AutoMigrate(&post.Post{})

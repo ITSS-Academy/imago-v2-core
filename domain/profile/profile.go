@@ -4,6 +4,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+
+	"github.com/itss-academy/imago/core/common"
 	"golang.org/x/net/context"
 	"gorm.io/gorm"
 )
@@ -36,6 +38,8 @@ type ProfileRepository interface {
 	GetAll(ctx context.Context) ([]*Profile, error)
 	Create(ctx context.Context, profile *Profile) error
 	Update(ctx context.Context, profile *Profile) error
+	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
+	GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
 }
 
 type ProfileUseCase interface {
@@ -43,6 +47,8 @@ type ProfileUseCase interface {
 	GetAll(ctx context.Context) ([]*Profile, error)
 	Create(ctx context.Context, profile *Profile) error
 	Update(ctx context.Context, profile *Profile) error
+	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
+	GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
 }
 
 type ProfileInterop interface {
@@ -53,6 +59,8 @@ type ProfileInterop interface {
 	Update(ctx context.Context, token string, profile *Profile) error
 	Follow(ctx context.Context, token string, profileId string, profileOtherId string) error
 	Unfollow(ctx context.Context, token string, profileId string, profileOtherId string) error
+	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
+	GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*any], error)
 }
 
 var (
