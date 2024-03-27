@@ -3,6 +3,7 @@ package ucase
 import (
 	"context"
 	firebaseAuth "firebase.google.com/go/v4/auth"
+	"fmt"
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 )
@@ -72,6 +73,7 @@ func (a AuthUseCase) Verify(ctx context.Context, token string) (*firebaseAuth.Us
 		return nil, err
 	}
 	record, err := a.authClient.GetUser(ctx, idToken.UID)
+	fmt.Println(idToken.UID)
 	return record, nil
 }
 func (a AuthUseCase) Validate(authData *auth.Auth) error {

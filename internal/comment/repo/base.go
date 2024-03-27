@@ -2,10 +2,11 @@ package repo
 
 import (
 	"context"
+	"math"
+
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/comment"
 	"gorm.io/gorm"
-	"math"
 )
 
 type CommentRepository struct {
@@ -57,7 +58,7 @@ func (c CommentRepository) GetComment(ctx context.Context, opts *common.QueryOpt
 		return nil, tx.Error
 	}
 	pageNum := int(math.Ceil(float64(count) / float64(limit)))
-	return &common.ListResult[*comment.Comment]{Data: commentData, EndPage: int(int64(pageNum))}, tx.Error
+	return &common.ListResult[*comment.Comment]{Data: commentData, EndPage: int(pageNum)}, tx.Error
 }
 
 func (c CommentRepository) UpdateComment(ctx context.Context, id string, comment *comment.Comment) error {

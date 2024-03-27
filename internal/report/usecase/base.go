@@ -3,68 +3,68 @@ package usecase
 import (
 	"context"
 	"github.com/itss-academy/imago/core/common"
-	"github.com/itss-academy/imago/core/domain/Report"
+	"github.com/itss-academy/imago/core/domain/report"
 )
 
 type ReportUseCase struct {
-	repo Report.ReportRepository
+	repo report.ReportRepository
 }
 
-func (r ReportUseCase) Create(ctx context.Context, reportData *Report.Report) error {
+func (r ReportUseCase) Create(ctx context.Context, reportData *report.Report) error {
 	err := r.Validate(reportData)
 	if err != nil {
 		return err
 	}
 	err = r.repo.Create(ctx, reportData)
 	if err != nil {
-		return Report.ErrReportNotCreated
+		return report.ErrReportNotCreated
 	}
 	return nil
 }
 
-func (r ReportUseCase) Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report.Report], error) {
+func (r ReportUseCase) Get(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*report.Report], error) {
 	if opts.Page < 1 {
-		return nil, Report.ErrInvalidReportPage
+		return nil, report.ErrInvalidReportPage
 	}
 	if opts.Size < 0 {
-		return nil, Report.ErrInvalidReportSize
+		return nil, report.ErrInvalidReportSize
 	}
 	return r.repo.Get(ctx, opts)
 }
 
-func (r ReportUseCase) GetById(ctx context.Context, id string) (*Report.Report, error) {
+func (r ReportUseCase) GetById(ctx context.Context, id string) (*report.Report, error) {
 	data, err := r.repo.GetById(ctx, id)
 	if err != nil {
-		return nil, Report.ErrReportNotFound
+		return nil, report.ErrReportNotFound
 	}
 	return data, nil
 }
 
-func (r ReportUseCase) GetAllByStatusCompleted(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report.Report], error) {
-	data, err := r.repo.GetAllByStatusCompleted(ctx, opts)
+func (r ReportUseCase) GetAllByStatusApproved(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*report.Report], error) {
+	data, err := r.repo.GetAllByStatusApproved(ctx, opts)
 	if err != nil {
-		return nil, Report.ErrReportNotFound
+		return nil, report.ErrReportNotFound
 	}
 	return data, nil
 }
 
-func (r ReportUseCase) GetAllByStatusPending(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Report.Report], error) {
+func (r ReportUseCase) GetAllByStatusPending(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*report.Report], error) {
 	data, err := r.repo.GetAllByStatusPending(ctx, opts)
 	if err != nil {
-		return nil, Report.ErrReportNotFound
+		return nil, report.ErrReportNotFound
 	}
 	return data, nil
 }
 
 // Update report by id
-func (r ReportUseCase) Update(ctx context.Context, reportData *Report.Report, id string) error {
+func (r ReportUseCase) Update(ctx context.Context, reportData *report.Report, id string) error {
 	err := r.Validate(reportData)
 	if err != nil {
 		return err
 	}
 	err = r.repo.Update(ctx, reportData, id)
 	if err != nil {
-		return Report.ErrReportNotUpdated
+		return report.ErrReportNotUpdated
 	}
 	return nil
 
@@ -74,39 +74,39 @@ func (r ReportUseCase) Update(ctx context.Context, reportData *Report.Report, id
 func (r ReportUseCase) Delete(ctx context.Context, id string) error {
 	err := r.repo.Delete(ctx, id)
 	if err != nil {
-		return Report.ErrReportNotFound
+		return report.ErrReportNotFound
 	}
 	return nil
 
 }
 
-func (r ReportUseCase) Validate(data *Report.Report) error {
+func (r ReportUseCase) Validate(data *report.Report) error {
 	if data.ID == "" {
-		return Report.ErrIDEmpty
+		return report.ErrIDEmpty
 	}
 	if data.Content == "" {
-		return Report.ErrContentEmpty
+		return report.ErrContentEmpty
 	}
 	if data.Type == "" {
-		return Report.ErrTypeEmpty
+		return report.ErrTypeEmpty
 	}
 	if data.TypeID == "" {
-		return Report.ErrTypeIDEmpty
+		return report.ErrTypeIDEmpty
 	}
 	if data.Reason == "" {
-		return Report.ErrReasonEmpty
+		return report.ErrReasonEmpty
 	}
 	if data.Status == "" {
-		return Report.ErrStatusEmpty
+		data.Status = report.StatusPending
 	}
 	if data.CreatorID == "" {
-		return Report.ErrCreatorIDEmpty
+		return report.ErrCreatorIDEmpty
 	}
 	return nil
 
 }
 
-func NewReportUseCase(repo Report.ReportRepository) *ReportUseCase {
+func NewReportUseCase(repo report.ReportRepository) *ReportUseCase {
 	return &ReportUseCase{
 		repo: repo,
 	}

@@ -2,10 +2,11 @@ package repo
 
 import (
 	"context"
+	"math"
+
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 	"gorm.io/gorm"
-	"math"
 )
 
 type AuthRepository struct {
