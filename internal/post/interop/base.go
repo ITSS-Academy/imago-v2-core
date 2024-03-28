@@ -38,21 +38,47 @@ func (p PostBaseInterop) Create(ctx context.Context, token string, data *post.Po
 	return p.postUseCase.Create(ctx, data)
 }
 
-//func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, id string, data *post.Post) error {
-//	_, err := p.authUseCase.Verify(ctx, token)
-//	if err != nil {
-//		return err
-//	}
-//	//postCommentData, err := p.postUseCase.GetPostById(ctx, id)
-//	if err != nil {
-//		return err
-//	}
-//	if data.CreatorId != data.CreatorId {
-//		return post.ErrPostCommentNotUpdated
-//	}
-//	data.ID = id
-//	return p.postUseCase.UpdatePostComment(ctx, id, data.Comment)
-//}
+func (p PostBaseInterop) GetDetail(ctx context.Context, token string, id string) (*post.Post, error) {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return p.postUseCase.GetDetail(ctx, id)
+}
+
+func (p PostBaseInterop) GetByUid(ctx context.Context, token string, opts *common.QueryOpts, style string) (*common.ListResult[*post.Post], error) {
+	record, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.postUseCase.GetByUid(ctx, record.UID, opts, style)
+}
+
+func (p PostBaseInterop) GetOther(ctx context.Context, token string, uid string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return p.postUseCase.GetOther(ctx, uid, opts)
+
+}
+
+func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, creatorId string, id string, data *post.Post) error {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	postCommentData, err := p.postUseCase.GetDetail(ctx, id)
+	if err != nil {
+		return err
+	}
+	if postCommentData.CreatorId != creatorId {
+		return post.ErrPostCommentNotUpdated
+	}
+	postCommentData.Comment = append(data.Comment, data.Comment...)
+	return p.postUseCase.UpdatePostComment(ctx, id, creatorId, data)
+}
 
 func NewPostBaseInterop(postUseCase post.PostUseCase, authUseCase auth.AuthUseCase) PostBaseInterop {
 	return PostBaseInterop{

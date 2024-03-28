@@ -47,10 +47,13 @@ func (c CommentHttpDelivery) GetCommentById(e echo.Context) error {
 }
 
 func (c CommentHttpDelivery) GetCommentByPostId(e echo.Context) error {
-	postId := e.QueryParam("post_id")
+	postId := e.QueryParam("postId")
 	token := e.Request().Header.Get("Authorization")
 	query := &common.QueryOpts{}
 	pageStr := e.QueryParam("page")
+	if postId == "" {
+		return e.JSON(http.StatusBadRequest, "postId is empty")
+	}
 	if pageStr == "" {
 		return e.JSON(http.StatusBadRequest, "page is empty")
 	}

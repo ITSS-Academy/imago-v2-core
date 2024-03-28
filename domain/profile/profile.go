@@ -27,7 +27,7 @@ type JSONStringArray []string
 
 type AuthProfile struct {
 	*auth.Auth
-	Profile    *Profile
+	Profile    *Profile `json:"profile"`
 	NumberPost int
 }
 
