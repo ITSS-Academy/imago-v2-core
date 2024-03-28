@@ -45,8 +45,10 @@ type JSONStringArray []string
 
 type PostRepository interface {
 	Create(ctx context.Context, post *Post) error
-	//GetById(ctx context.Context, id string) (*Post, error)
-	//GetByUid(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	GetDetail(ctx context.Context, id string) (*Post, error)
+	GetOther(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	GetMine(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	GetShared(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, post *Post) error
 	//Delete(ctx context.Context, id string) error
@@ -56,8 +58,9 @@ type PostRepository interface {
 
 type PostUseCase interface {
 	Create(ctx context.Context, post *Post) error
-	//GetById(ctx context.Context, id string) (*Post, error)
-	//GetByUid(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	GetDetail(ctx context.Context, id string) (*Post, error)
+	GetByUid(ctx context.Context, uid string, opts *common.QueryOpts, style string) (*common.ListResult[*Post], error)
+	GetOther(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, post *Post) error
 	//Delete(ctx context.Context, id string) error
@@ -67,8 +70,9 @@ type PostUseCase interface {
 
 type PostInterop interface {
 	Create(ctx context.Context, token string, post *Post) error
-	//GetById(ctx context.Context, token string, id string) (*Post, error)
-	//GetByUid(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	GetDetail(ctx context.Context, token string, id string) (*Post, error)
+	GetByUid(ctx context.Context, token string, opts *common.QueryOpts, style string) (*common.ListResult[*Post], error)
+	GetOther(ctx context.Context, token string, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, token string, post *Post) error
 	//Delete(ctx context.Context, token string, id string) error
@@ -81,7 +85,9 @@ var (
 	ErrPostInvalidSize       = errors.New("post invalid size")
 	ErrPostInvalidPage       = errors.New("post invalid page")
 	ErrPostNotCreated        = errors.New("post not created")
+	ErrPostRequiredID        = errors.New("post required id")
 	ErrPostRequiredContent   = errors.New("post required content")
 	ErrPostRequiredPhoto     = errors.New("post required photo")
 	ErrPostCommentNotUpdated = errors.New("post comment not updated")
+	ErrPostInvalidStyle      = errors.New("post invalid style")
 )
