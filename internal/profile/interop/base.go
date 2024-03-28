@@ -2,6 +2,8 @@ package interop
 
 import (
 	"context"
+
+	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 	"github.com/itss-academy/imago/core/domain/profile"
 )
@@ -172,6 +174,19 @@ func (p ProfileInterop) Unfollow(ctx context.Context, token string, profileId st
 		return err
 	}
 	return nil
+}
+
+func (p ProfileInterop) GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p ProfileInterop) GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*any], error) {
+	_, err := p.authucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return p.ucase.GetAllAuthProfile(ctx, opts)
 }
 
 func (p ProfileInterop) GetAllExceptMine(ctx context.Context, token string) ([]*profile.Profile, error) {
