@@ -61,6 +61,7 @@ type ProfileInterop interface {
 	Unfollow(ctx context.Context, token string, profileId string, profileOtherId string) error
 	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
 	GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*any], error)
+	GetAllExceptMine(ctx context.Context, token string) ([]*Profile, error)
 }
 
 var (
