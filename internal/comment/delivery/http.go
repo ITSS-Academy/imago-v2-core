@@ -47,16 +47,25 @@ func (c CommentHttpDelivery) GetCommentById(e echo.Context) error {
 }
 
 func (c CommentHttpDelivery) GetCommentByPostId(e echo.Context) error {
-	postId := e.QueryParam("post_id")
+	postId := e.QueryParam("postId")
 	token := e.Request().Header.Get("Authorization")
 	query := &common.QueryOpts{}
 	pageStr := e.QueryParam("page")
+	if postId == "" {
+		return e.JSON(http.StatusBadRequest, "postId is empty")
+	}
 	if pageStr == "" {
 		return e.JSON(http.StatusBadRequest, "page is empty")
+	}
+	if pageStr <= "0" {
+		pageStr = "1"
 	}
 	sizeStr := e.QueryParam("size")
 	if sizeStr == "" {
 		return e.JSON(http.StatusBadRequest, "size is empty")
+	}
+	if sizeStr <= "0" {
+		sizeStr = "10"
 	}
 	if pageStr != "" {
 		page, err := strconv.ParseInt(pageStr, 10, 64)
@@ -89,9 +98,15 @@ func (c CommentHttpDelivery) GetComment(e echo.Context) error {
 	if pageStr == "" {
 		return e.JSON(http.StatusBadRequest, "page is empty")
 	}
+	if pageStr <= "0" {
+		pageStr = "1"
+	}
 	sizeStr := e.QueryParam("size")
 	if sizeStr == "" {
 		return e.JSON(http.StatusBadRequest, "size is empty")
+	}
+	if sizeStr <= "0" {
+		sizeStr = "10"
 	}
 	if pageStr != "" {
 		page, err := strconv.ParseInt(pageStr, 10, 64)

@@ -176,12 +176,15 @@ func (p ProfileInterop) Unfollow(ctx context.Context, token string, profileId st
 	return nil
 }
 
-func (p ProfileInterop) GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error) {
-	//TODO implement me
-	panic("implement me")
+func (p ProfileInterop) GetAllAuthNoProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
+	_, err := p.authucase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return p.ucase.GetAllAuthNoProfile(ctx, opts)
 }
 
-func (p ProfileInterop) GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*any], error) {
+func (p ProfileInterop) GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*profile.AuthProfile], error) {
 	_, err := p.authucase.Verify(ctx, token)
 	if err != nil {
 		return nil, err

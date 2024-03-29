@@ -115,10 +115,10 @@ func (p PostRepository) List(ctx context.Context, opts *common.QueryOpts) (*comm
 	}, nil
 }
 
-//func (p PostRepository) UpdatePostComment(ctx context.Context, id string, comment []string) error {
-//	tx := p.db.WithContext(ctx).Model(&post.Post{}).Where("id = ?", id).Update("comment", comment)
-//	return tx.Error
-//}
+func (p PostRepository) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
+	tx := p.db.Where("id = ?", id).Updates(data)
+	return tx.Error
+}
 
 func NewPostRepository(db *gorm.DB) *PostRepository {
 	err := db.AutoMigrate(&post.Post{})

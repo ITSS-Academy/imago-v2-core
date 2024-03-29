@@ -3,6 +3,7 @@ package ucase
 import (
 	"context"
 	"github.com/itss-academy/imago/core/common"
+	"github.com/itss-academy/imago/core/domain/auth"
 	"github.com/itss-academy/imago/core/domain/profile"
 )
 
@@ -60,12 +61,15 @@ func (p ProfileUseCase) Update(ctx context.Context, profileData *profile.Profile
 	return nil
 }
 
-func (p ProfileUseCase) GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error) {
-	//TODO implement me
-	panic("implement me")
+func (p ProfileUseCase) GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error) {
+	data, err := p.repo.GetAllAuthNoProfile(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
-func (p ProfileUseCase) GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error) {
+func (p ProfileUseCase) GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*profile.AuthProfile], error) {
 	data, err := p.repo.GetAllAuthProfile(ctx, opts)
 	if err != nil {
 		return nil, err

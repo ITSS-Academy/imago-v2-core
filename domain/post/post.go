@@ -53,7 +53,7 @@ type PostRepository interface {
 	//Update(ctx context.Context, post *Post) error
 	//Delete(ctx context.Context, id string) error
 	//GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
-	//UpdatePostComment(ctx context.Context, id string, comment []string) error
+	UpdatePostComment(ctx context.Context, id string, post *Post) error
 }
 
 type PostUseCase interface {
@@ -65,7 +65,7 @@ type PostUseCase interface {
 	//Update(ctx context.Context, post *Post) error
 	//Delete(ctx context.Context, id string) error
 	//GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
-	//UpdatePostComment(ctx context.Context, id string, comment []string) error
+	UpdatePostComment(ctx context.Context, id string, post *Post) error
 }
 
 type PostInterop interface {
@@ -77,7 +77,7 @@ type PostInterop interface {
 	//Update(ctx context.Context, token string, post *Post) error
 	//Delete(ctx context.Context, token string, id string) error
 	//GetByCategory(ctx context.Context, token string, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
-	//UpdatePostComment(ctx context.Context, token string, id string, comment []string) error
+	UpdatePostComment(ctx context.Context, token string, id string, post *Post) error
 }
 
 var (
@@ -86,8 +86,10 @@ var (
 	ErrPostInvalidPage       = errors.New("post invalid page")
 	ErrPostNotCreated        = errors.New("post not created")
 	ErrPostRequiredID        = errors.New("post required id")
+	ErrPostRequiredCreatorID = errors.New("post required creator id")
 	ErrPostRequiredContent   = errors.New("post required content")
 	ErrPostRequiredPhoto     = errors.New("post required photo")
+	ErrPostRequiredComment   = errors.New("post required comment")
 	ErrPostCommentNotUpdated = errors.New("post comment not updated")
 	ErrPostInvalidStyle      = errors.New("post invalid style")
 )
