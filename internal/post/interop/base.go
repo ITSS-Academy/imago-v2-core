@@ -64,7 +64,7 @@ func (p PostBaseInterop) GetOther(ctx context.Context, token string, uid string,
 
 }
 
-func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, creatorId string, id string, data *post.Post) error {
+func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, id string, data *post.Post) error {
 	_, err := p.authUseCase.Verify(ctx, token)
 	if err != nil {
 		return err
@@ -73,11 +73,9 @@ func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, cr
 	if err != nil {
 		return err
 	}
-	if postCommentData.CreatorId != creatorId {
-		return post.ErrPostCommentNotUpdated
-	}
-	postCommentData.Comment = append(data.Comment, data.Comment...)
-	return p.postUseCase.UpdatePostComment(ctx, id, creatorId, data)
+	postCommentData.ID = id
+	postCommentData.Comment = append(postCommentData.Comment, data.Comment...)
+	return p.postUseCase.UpdatePostComment(ctx, id, data)
 }
 
 func NewPostBaseInterop(postUseCase post.PostUseCase, authUseCase auth.AuthUseCase) PostBaseInterop {

@@ -148,21 +148,13 @@ func (p PostHttpDelivery) GetOther(c echo.Context) error {
 
 func (p PostHttpDelivery) UpdatePostComment(c echo.Context) error {
 	id := c.QueryParam("id")
-	creatorId := c.QueryParam("creator_id")
 	postData := &post.Post{}
 	if err := c.Bind(postData); err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	token := c.Request().Header.Get("Authorization")
-	err := p.interop.UpdatePostComment(c.Request().Context(), token, id, creatorId, postData)
+	err := p.interop.UpdatePostComment(c.Request().Context(), token, id, postData)
 	if err != nil {
-		//if errors.Is(err, post.ErrPostRequiredID) {
-		//	return c.JSON(http.StatusBadRequest, err.Error())
-		//}
-		//if errors.Is(err, post.ErrPostRequiredCreatorID) {
-		//	return c.JSON(http.StatusBadRequest, err.Error())
-		//}
-		//return c.JSON(http.StatusUnauthorized, err.Error())
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, postData)

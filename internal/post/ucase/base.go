@@ -83,12 +83,11 @@ func (p PostUseCase) GetDetail(ctx context.Context, id string) (*post.Post, erro
 	return p.postRepo.GetDetail(ctx, id)
 }
 
-func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, creatorId string, data *post.Post) error {
-	err := p.Validate(data)
-	if err != nil {
-		return err
+func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
+	err := p.postRepo.UpdatePostComment(ctx, id, data)
+	if data.Comment == nil {
+		return post.ErrPostRequiredComment
 	}
-	err = p.postRepo.UpdatePostComment(ctx, id, creatorId, data)
 	if err != nil {
 		return post.ErrPostCommentNotUpdated
 	}
@@ -101,9 +100,6 @@ func (p PostUseCase) Validate(postData *post.Post) error {
 	}
 	if len(postData.PhotoUrl) == 0 {
 		return post.ErrPostRequiredPhoto
-	}
-	if postData.Comment == nil {
-		return post.ErrPostRequiredComment
 	}
 	return nil
 }

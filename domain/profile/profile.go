@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/auth"
 	"golang.org/x/net/context"
@@ -67,6 +68,7 @@ type ProfileInterop interface {
 	Unfollow(ctx context.Context, token string, profileId string, profileOtherId string) error
 	GetAllAuthNoProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error)
 	GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*AuthProfile], error)
+	GetAllExceptMine(ctx context.Context, token string) ([]*Profile, error)
 }
 
 var (
