@@ -38,6 +38,15 @@ func (p PostBaseInterop) Create(ctx context.Context, token string, data *post.Po
 	return p.postUseCase.Create(ctx, data)
 }
 
+func (p PostBaseInterop) Delete(ctx context.Context, token string, id string) error {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	return p.postUseCase.Delete(ctx, id)
+
+}
+
 func (p PostBaseInterop) GetDetail(ctx context.Context, token string, id string) (*post.Post, error) {
 	_, err := p.authUseCase.Verify(ctx, token)
 	if err != nil {
@@ -61,6 +70,14 @@ func (p PostBaseInterop) GetOther(ctx context.Context, token string, uid string,
 		return nil, err
 	}
 	return p.postUseCase.GetOther(ctx, uid, opts)
+
+}
+func (p PostBaseInterop) GetByCategory(ctx context.Context, token string, categoryId string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return p.postUseCase.GetByCategory(ctx, categoryId, opts)
 
 }
 

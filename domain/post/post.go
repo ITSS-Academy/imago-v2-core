@@ -51,6 +51,9 @@ type PostRepository interface {
 	GetShared(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, post *Post) error
+	Delete(ctx context.Context, id string) error
+	GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	//UpdatePostComment(ctx context.Context, id string, comment []string) error
 	//Delete(ctx context.Context, id string) error
 	//GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	UpdatePostComment(ctx context.Context, id string, post *Post) error
@@ -63,6 +66,9 @@ type PostUseCase interface {
 	GetOther(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, post *Post) error
+	Delete(ctx context.Context, id string) error
+	GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	//UpdatePostComment(ctx context.Context, id string, comment []string) error
 	//Delete(ctx context.Context, id string) error
 	//GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	UpdatePostComment(ctx context.Context, id string, post *Post) error
@@ -75,6 +81,9 @@ type PostInterop interface {
 	GetOther(ctx context.Context, token string, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	//Update(ctx context.Context, token string, post *Post) error
+	Delete(ctx context.Context, token string, id string) error
+	GetByCategory(ctx context.Context, token string, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
+	//UpdatePostComment(ctx context.Context, token string, id string, comment []string) error
 	//Delete(ctx context.Context, token string, id string) error
 	//GetByCategory(ctx context.Context, token string, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	UpdatePostComment(ctx context.Context, token string, id string, post *Post) error

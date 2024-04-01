@@ -22,12 +22,17 @@ func (p PostUseCase) Create(ctx context.Context, data *post.Post) error {
 	return nil
 }
 
-func (p PostUseCase) List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
-	if opts.Page <= 0 {
-		return nil, post.ErrPostInvalidPage
+func (p PostUseCase) Delete(ctx context.Context, id string) error {
+	if id == "" {
+		return post.ErrPostRequiredID
 	}
-	if opts.Size <= 0 {
-		return nil, post.ErrPostInvalidSize
+	return p.postRepo.Delete(ctx, id)
+}
+
+func (p PostUseCase) List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
+	err := p.OptsValidate(opts)
+	if err != nil {
+		return nil, err
 	}
 	result, err := p.postRepo.List(ctx, opts)
 	if err != nil {
@@ -36,11 +41,9 @@ func (p PostUseCase) List(ctx context.Context, opts *common.QueryOpts) (*common.
 	return result, nil
 }
 func (p PostUseCase) GetByUid(ctx context.Context, uid string, opts *common.QueryOpts, style string) (*common.ListResult[*post.Post], error) {
-	if opts.Page <= 0 {
-		return nil, post.ErrPostInvalidPage
-	}
-	if opts.Size <= 0 {
-		return nil, post.ErrPostInvalidSize
+	err := p.OptsValidate(opts)
+	if err != nil {
+		return nil, err
 	}
 	if style == "mine" {
 		result, err := p.postRepo.GetMine(ctx, uid, opts)
@@ -61,11 +64,9 @@ func (p PostUseCase) GetByUid(ctx context.Context, uid string, opts *common.Quer
 }
 
 func (p PostUseCase) GetOther(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
-	if opts.Page <= 0 {
-		return nil, post.ErrPostInvalidPage
-	}
-	if opts.Size <= 0 {
-		return nil, post.ErrPostInvalidSize
+	err := p.OptsValidate(opts)
+	if err != nil {
+		return nil, err
 	}
 	result, err := p.postRepo.GetOther(ctx, uid, opts)
 	if err != nil {
@@ -83,6 +84,30 @@ func (p PostUseCase) GetDetail(ctx context.Context, id string) (*post.Post, erro
 	return p.postRepo.GetDetail(ctx, id)
 }
 
+func (p PostUseCase) GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
+	err := p.OptsValidate(opts)
+	if err != nil {
+		return nil, err
+	}
+	result, err := p.postRepo.GetByCategory(ctx, categoryId, opts)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+
+}
+
+//func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
+//	err := p.Validate(data)
+//	if err != nil {
+//		return err
+//	}
+//	err = p.postRepo.UpdatePostComment(ctx, id, data.Comment)
+//	if err != nil {
+//		return post.ErrPostCommentNotUpdated
+//	}
+//	return nil
+//}
 func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
 	err := p.postRepo.UpdatePostComment(ctx, id, data)
 	if data.Comment == nil {
@@ -102,6 +127,17 @@ func (p PostUseCase) Validate(postData *post.Post) error {
 		return post.ErrPostRequiredPhoto
 	}
 	return nil
+}
+
+func (p PostUseCase) OptsValidate(opts *common.QueryOpts) error {
+	if opts.Page <= 0 {
+		return post.ErrPostInvalidPage
+	}
+	if opts.Size <= 0 {
+		return post.ErrPostInvalidSize
+	}
+	return nil
+
 }
 
 func NewPostUseCase(postRepo post.PostRepository) *PostUseCase {
