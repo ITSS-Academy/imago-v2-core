@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/itss-academy/imago/core/common"
+	"github.com/itss-academy/imago/core/domain/auth"
 	"golang.org/x/net/context"
 	"gorm.io/gorm"
 )
@@ -25,6 +26,12 @@ type Profile struct {
 }
 type JSONStringArray []string
 
+type AuthProfile struct {
+	*auth.Auth
+	Profile    *Profile `json:"profile"`
+	NumberPost int
+}
+
 func (a *JSONStringArray) Scan(value interface{}) error {
 	return json.Unmarshal(value.([]byte), &a)
 }
@@ -38,8 +45,8 @@ type ProfileRepository interface {
 	GetAll(ctx context.Context) ([]*Profile, error)
 	Create(ctx context.Context, profile *Profile) error
 	Update(ctx context.Context, profile *Profile) error
-	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
-	GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
+	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error)
+	GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*AuthProfile], error)
 }
 
 type ProfileUseCase interface {
@@ -47,8 +54,8 @@ type ProfileUseCase interface {
 	GetAll(ctx context.Context) ([]*Profile, error)
 	Create(ctx context.Context, profile *Profile) error
 	Update(ctx context.Context, profile *Profile) error
-	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
-	GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
+	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error)
+	GetAllAuthProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*AuthProfile], error)
 }
 
 type ProfileInterop interface {
@@ -59,8 +66,9 @@ type ProfileInterop interface {
 	Update(ctx context.Context, token string, profile *Profile) error
 	Follow(ctx context.Context, token string, profileId string, profileOtherId string) error
 	Unfollow(ctx context.Context, token string, profileId string, profileOtherId string) error
-	GetAllAuthNoProfile(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*any], error)
-	GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*any], error)
+	GetAllAuthNoProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*auth.Auth], error)
+	GetAllAuthProfile(ctx context.Context, token string, opts *common.QueryOpts) (*common.ListResult[*AuthProfile], error)
+	GetAllExceptMine(ctx context.Context, token string) ([]*Profile, error)
 }
 
 var (

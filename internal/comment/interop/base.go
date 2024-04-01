@@ -21,7 +21,7 @@ func (c CommentInterop) CreateComment(ctx context.Context, token string, comment
 	commentData.CreatorID = record.UID
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("20060102150405")
-	commentData.ID = formattedTime + commentData.CreatorID
+	commentData.ID = formattedTime + commentData.CreatorID[:10]
 	return c.ucase.CreateComment(ctx, commentData)
 }
 

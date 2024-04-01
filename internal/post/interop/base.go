@@ -81,21 +81,19 @@ func (p PostBaseInterop) GetByCategory(ctx context.Context, token string, catego
 
 }
 
-//func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, id string, data *post.Post) error {
-//	_, err := p.authUseCase.Verify(ctx, token)
-//	if err != nil {
-//		return err
-//	}
-//	//postCommentData, err := p.postUseCase.GetPostById(ctx, id)
-//	if err != nil {
-//		return err
-//	}
-//	if data.CreatorId != data.CreatorId {
-//		return post.ErrPostCommentNotUpdated
-//	}
-//	data.ID = id
-//	return p.postUseCase.UpdatePostComment(ctx, id, data.Comment)
-//}
+func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, id string, data *post.Post) error {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	postCommentData, err := p.postUseCase.GetDetail(ctx, id)
+	if err != nil {
+		return err
+	}
+	postCommentData.ID = id
+	postCommentData.Comment = append(postCommentData.Comment, data.Comment...)
+	return p.postUseCase.UpdatePostComment(ctx, id, data)
+}
 
 func NewPostBaseInterop(postUseCase post.PostUseCase, authUseCase auth.AuthUseCase) PostBaseInterop {
 	return PostBaseInterop{

@@ -41,7 +41,7 @@ func (c CommentRepository) GetCommentByPostId(ctx context.Context, postId string
 	if count > 0 {
 		pageNum = int64(math.Ceil(float64(count) / float64(limit)))
 	}
-	return &common.ListResult[*comment.Comment]{Data: commentData, EndPage: int(int64(int(pageNum)))}, tx.Error
+	return &common.ListResult[*comment.Comment]{Data: commentData, EndPage: int(pageNum)}, tx.Error
 }
 
 func (c CommentRepository) GetComment(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*comment.Comment], error) {
@@ -58,7 +58,7 @@ func (c CommentRepository) GetComment(ctx context.Context, opts *common.QueryOpt
 		return nil, tx.Error
 	}
 	pageNum := int(math.Ceil(float64(count) / float64(limit)))
-	return &common.ListResult[*comment.Comment]{Data: commentData, EndPage: int(pageNum)}, tx.Error
+	return &common.ListResult[*comment.Comment]{Data: commentData, EndPage: pageNum}, tx.Error
 }
 
 func (c CommentRepository) UpdateComment(ctx context.Context, id string, comment *comment.Comment) error {

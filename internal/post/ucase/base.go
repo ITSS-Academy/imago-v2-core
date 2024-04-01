@@ -108,6 +108,16 @@ func (p PostUseCase) GetByCategory(ctx context.Context, categoryId string, opts 
 //	}
 //	return nil
 //}
+func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
+	err := p.postRepo.UpdatePostComment(ctx, id, data)
+	if data.Comment == nil {
+		return post.ErrPostRequiredComment
+	}
+	if err != nil {
+		return post.ErrPostCommentNotUpdated
+	}
+	return nil
+}
 
 func (p PostUseCase) Validate(postData *post.Post) error {
 	if postData.Content == "" {
