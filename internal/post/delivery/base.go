@@ -193,6 +193,7 @@ func (p PostHttpDelivery) GetByCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, post)
+}
 
 func (p PostHttpDelivery) UpdatePostComment(c echo.Context) error {
 	id := c.QueryParam("id")
@@ -212,7 +213,7 @@ func NewPostHttpDelivery(api *echo.Group, interop post.PostInterop) *PostHttpDel
 	handler := &PostHttpDelivery{api: api, interop: interop}
 	api.POST("", handler.Create)
 	api.GET("/all", handler.List)
-	api.GET("detail", handler.GetDetail)
+	api.GET("/detail", handler.GetDetail)
 	api.GET("", handler.GetByUid)
 	api.GET("/other", handler.GetOther)
 	api.GET("/category", handler.GetByCategory)
