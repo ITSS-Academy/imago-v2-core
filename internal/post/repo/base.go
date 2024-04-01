@@ -18,6 +18,11 @@ func (p PostRepository) Create(ctx context.Context, post *post.Post) error {
 	return tx.Error
 }
 
+func (p PostRepository) Delete(ctx context.Context, id string) error {
+	tx := p.db.WithContext(ctx).Where("id = ?", id).Delete(&post.Post{})
+	return tx.Error
+}
+
 func (p PostRepository) GetDetail(ctx context.Context, id string) (*post.Post, error) {
 	found := &post.Post{}
 	tx := p.db.WithContext(ctx).Where("id = ?", id).First(&found)
@@ -91,10 +96,26 @@ func (p PostRepository) GetOther(ctx context.Context, uid string, opts *common.Q
 
 }
 
-//func (p PostRepository) GetByUid(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
-//
-//	panic("implement me")
-//}
+func (p PostRepository) GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
+
+	offset := (opts.Page - 1) * opts.Size
+	result := make([]*post.Post, 0)
+	tx := p.db.WithContext(ctx).Where("category_id LIKE ?", "%"+categoryId+"%").Offset(offset).Limit(opts.Size).Find(&result)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	count := int64(0)
+	tx = p.db.WithContext(ctx).Model(&post.Post{}).Count(&count)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	page := int(math.Ceil(float64(count) / float64(opts.Size)))
+	return &common.ListResult[*post.Post]{
+		Data:    result,
+		EndPage: page,
+	}, nil
+
+}
 
 func (p PostRepository) List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
 	offset := (opts.Page - 1) * opts.Size
