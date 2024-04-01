@@ -64,6 +64,34 @@ func (p PostBaseInterop) GetOther(ctx context.Context, token string, uid string,
 
 }
 
+func (p PostBaseInterop) Update(ctx context.Context, token string, data *post.Post) error {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	postData, err := p.postUseCase.GetDetail(ctx, data.ID)
+	if err != nil {
+		return err
+	}
+	if data.ID != postData.ID {
+		return post.ErrPostRequiredID
+	}
+	if postData.CreatorId != data.CreatorId {
+		return post.ErrPostRequiredCreatorID
+	}
+	data.Comment = make([]string, 0)
+	data.Like = make([]string, 0)
+	if data.HashTag == nil {
+		data.HashTag = make([]string, 0)
+	}
+	if data.Mention == nil {
+		data.Mention = make([]string, 0)
+	}
+	data.Share = make([]string, 0)
+	data.Status = "active"
+	return p.postUseCase.Update(ctx, data)
+}
+
 func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, id string, data *post.Post) error {
 	_, err := p.authUseCase.Verify(ctx, token)
 	if err != nil {

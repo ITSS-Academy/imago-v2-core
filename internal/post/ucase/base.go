@@ -83,6 +83,18 @@ func (p PostUseCase) GetDetail(ctx context.Context, id string) (*post.Post, erro
 	return p.postRepo.GetDetail(ctx, id)
 }
 
+func (p PostUseCase) Update(ctx context.Context, data *post.Post) error {
+	err := p.Validate(data)
+	if err != nil {
+		return err
+	}
+	err = p.postRepo.Update(ctx, data)
+	if err != nil {
+		return post.ErrPostNotUpdated
+	}
+	return nil
+}
+
 func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
 	err := p.postRepo.UpdatePostComment(ctx, id, data)
 	if data.Comment == nil {
@@ -95,6 +107,9 @@ func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *pos
 }
 
 func (p PostUseCase) Validate(postData *post.Post) error {
+	if postData.ID == "" {
+		return post.ErrPostRequiredID
+	}
 	if postData.Content == "" {
 		return post.ErrPostRequiredContent
 	}

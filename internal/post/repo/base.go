@@ -115,6 +115,11 @@ func (p PostRepository) List(ctx context.Context, opts *common.QueryOpts) (*comm
 	}, nil
 }
 
+func (p PostRepository) Update(ctx context.Context, data *post.Post) error {
+	tx := p.db.Where("id = ?", data.ID).Updates(data)
+	return tx.Error
+}
+
 func (p PostRepository) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
 	tx := p.db.Where("id = ?", id).Updates(data)
 	return tx.Error

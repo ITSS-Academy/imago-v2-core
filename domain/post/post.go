@@ -50,7 +50,7 @@ type PostRepository interface {
 	GetMine(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	GetShared(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
-	//Update(ctx context.Context, post *Post) error
+	Update(ctx context.Context, post *Post) error
 	//Delete(ctx context.Context, id string) error
 	//GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	UpdatePostComment(ctx context.Context, id string, post *Post) error
@@ -62,7 +62,7 @@ type PostUseCase interface {
 	GetByUid(ctx context.Context, uid string, opts *common.QueryOpts, style string) (*common.ListResult[*Post], error)
 	GetOther(ctx context.Context, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
-	//Update(ctx context.Context, post *Post) error
+	Update(ctx context.Context, post *Post) error
 	//Delete(ctx context.Context, id string) error
 	//GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	UpdatePostComment(ctx context.Context, id string, post *Post) error
@@ -74,7 +74,7 @@ type PostInterop interface {
 	GetByUid(ctx context.Context, token string, opts *common.QueryOpts, style string) (*common.ListResult[*Post], error)
 	GetOther(ctx context.Context, token string, uid string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	List(ctx context.Context, opts *common.QueryOpts) (*common.ListResult[*Post], error)
-	//Update(ctx context.Context, token string, post *Post) error
+	Update(ctx context.Context, token string, post *Post) error
 	//Delete(ctx context.Context, token string, id string) error
 	//GetByCategory(ctx context.Context, token string, categoryId string, opts *common.QueryOpts) (*common.ListResult[*Post], error)
 	UpdatePostComment(ctx context.Context, token string, id string, post *Post) error
@@ -90,6 +90,7 @@ var (
 	ErrPostRequiredContent   = errors.New("post required content")
 	ErrPostRequiredPhoto     = errors.New("post required photo")
 	ErrPostRequiredComment   = errors.New("post required comment")
+	ErrPostNotUpdated        = errors.New("post not updated")
 	ErrPostCommentNotUpdated = errors.New("post comment not updated")
 	ErrPostInvalidStyle      = errors.New("post invalid style")
 )

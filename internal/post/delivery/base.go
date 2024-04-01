@@ -143,7 +143,19 @@ func (p PostHttpDelivery) GetOther(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, post)
+}
 
+func (p PostHttpDelivery) Update(c echo.Context) error {
+	postData := &post.Post{}
+	if err := c.Bind(postData); err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+	token := c.Request().Header.Get("Authorization")
+	err := p.interop.Update(c.Request().Context(), token, postData)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, postData)
 }
 
 func (p PostHttpDelivery) UpdatePostComment(c echo.Context) error {
@@ -167,6 +179,7 @@ func NewPostHttpDelivery(api *echo.Group, interop post.PostInterop) *PostHttpDel
 	api.GET("detail", handler.GetDetail)
 	api.GET("", handler.GetByUid)
 	api.GET("/other", handler.GetOther)
+	api.PUT("", handler.Update)
 	api.PUT("/comment", handler.UpdatePostComment)
 	return handler
 }
