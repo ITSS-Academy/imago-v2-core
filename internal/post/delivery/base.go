@@ -226,7 +226,7 @@ func NewPostHttpDelivery(api *echo.Group, interop post.PostInterop) *PostHttpDel
 	handler := &PostHttpDelivery{api: api, interop: interop}
 	api.POST("", handler.Create)
 	api.GET("/all", handler.List)
-	api.GET("detail", handler.GetDetail)
+	api.GET("/detail", handler.GetDetail)
 	api.GET("", handler.GetByUid)
 	api.GET("/other", handler.GetOther)
 	api.PUT("", handler.Update)
