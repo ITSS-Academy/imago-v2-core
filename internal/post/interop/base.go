@@ -81,6 +81,37 @@ func (p PostBaseInterop) GetByCategory(ctx context.Context, token string, catego
 
 }
 
+func (p PostBaseInterop) Update(ctx context.Context, token string, data *post.Post) error {
+	_, err := p.authUseCase.Verify(ctx, token)
+	if err != nil {
+		return err
+	}
+	postData, err := p.postUseCase.GetDetail(ctx, data.ID)
+	if postData.ID != data.ID {
+		return post.ErrPostRequiredID
+	}
+	if postData.CreatorId != data.CreatorId {
+		return post.ErrPostRequiredCreatorID
+	}
+	if data.Comment == nil {
+		data.Comment = postData.Comment
+	}
+	if data.Like == nil {
+		data.Like = postData.Like
+	}
+	if data.HashTag == nil {
+		data.HashTag = postData.HashTag
+	}
+	if data.Mention == nil {
+		data.Mention = postData.Mention
+	}
+	if data.Share == nil {
+		data.Share = postData.Share
+	}
+	data.Status = "active"
+	return p.postUseCase.Update(ctx, data)
+}
+
 func (p PostBaseInterop) UpdatePostComment(ctx context.Context, token string, id string, data *post.Post) error {
 	_, err := p.authUseCase.Verify(ctx, token)
 	if err != nil {
