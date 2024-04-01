@@ -2,6 +2,7 @@ package ucase
 
 import (
 	"context"
+
 	"github.com/itss-academy/imago/core/common"
 	"github.com/itss-academy/imago/core/domain/post"
 )
@@ -84,6 +85,18 @@ func (p PostUseCase) GetDetail(ctx context.Context, id string) (*post.Post, erro
 	return p.postRepo.GetDetail(ctx, id)
 }
 
+func (p PostUseCase) Update(ctx context.Context, data *post.Post) error {
+	err := p.Validate(data)
+	if err != nil {
+		return err
+	}
+	err = p.postRepo.Update(ctx, data)
+	if err != nil {
+		return post.ErrPostNotUpdated
+	}
+	return nil
+}
+
 func (p PostUseCase) GetByCategory(ctx context.Context, categoryId string, opts *common.QueryOpts) (*common.ListResult[*post.Post], error) {
 	err := p.OptsValidate(opts)
 	if err != nil {
@@ -97,17 +110,6 @@ func (p PostUseCase) GetByCategory(ctx context.Context, categoryId string, opts 
 
 }
 
-//func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
-//	err := p.Validate(data)
-//	if err != nil {
-//		return err
-//	}
-//	err = p.postRepo.UpdatePostComment(ctx, id, data.Comment)
-//	if err != nil {
-//		return post.ErrPostCommentNotUpdated
-//	}
-//	return nil
-//}
 func (p PostUseCase) UpdatePostComment(ctx context.Context, id string, data *post.Post) error {
 	err := p.postRepo.UpdatePostComment(ctx, id, data)
 	if data.Comment == nil {
